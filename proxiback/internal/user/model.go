@@ -8,8 +8,8 @@ import (
 type status string
 
 const (
-	active   status = "active"
-	inactive status = "inactive"
+	StatusActive     status = "ACTIVE"
+	StatusInactive   status = "INACTIVE"
 )
 
 type User struct {

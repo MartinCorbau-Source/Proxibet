@@ -2,91 +2,45 @@ package main
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
-	"time"
+
+	"github.com/jackc/pgx/v5/pgxpool"
+
+	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/auth"
+	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/user"	
 )
 
 func main() {
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-
-	port := getEnvironmentVariable("HTTP_PORT", "8080")
-
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("GET /health", func(
-		responseWriter http.ResponseWriter,
-		request *http.Request,
-	) {
-		responseWriter.Header().Set("Content-Type", "application/json")
-		responseWriter.WriteHeader(http.StatusOK)
-
-		_, _ = responseWriter.Write([]byte(`{"status":"ok"}`))
-	})
-
-	server := &http.Server{
-		Addr:              ":" + port,
-		Handler:           mux,
-		ReadHeaderTimeout: 5 * time.Second,
-		ReadTimeout:       10 * time.Second,
-		WriteTimeout:      10 * time.Second,
-		IdleTimeout:       60 * time.Second,
-	}
-
-	serverErrors := make(chan error, 1)
-
-	go func() {
-		logger.Info(
-			"starting HTTP server",
-			"port",
-			port,
-		)
-
-		serverErrors <- server.ListenAndServe()
-	}()
-
-	shutdownSignal := make(chan os.Signal, 1)
-
-	signal.Notify(
-		shutdownSignal,
-		syscall.SIGINT,
-		syscall.SIGTERM,
+	logger := slog.New(
+		slog.NewJSONHandler(os.Stdout, nil),
 	)
 
-	select {
-	case signal := <-shutdownSignal:
-		logger.Info(
-			"shutdown signal received",
-			"signal",
-			signal.String(),
-		)
-
-	case err := <-serverErrors:
-		if !errors.Is(err, http.ErrServerClosed) {
-			logger.Error(
-				"HTTP server stopped unexpectedly",
-				"error",
-				err,
-			)
-
-			os.Exit(1)
-		}
+	databaseURL := os.Getenv("DATABASE_URL")
+	if databaseURL == "" {
+		logger.Error("DATABASE_URL is missing")
+		os.Exit(1)
 	}
 
-	shutdownContext, cancel := context.WithTimeout(
+	pool, err := pgxpool.New(
 		context.Background(),
-		10*time.Second,
+		databaseURL,
 	)
-	defer cancel()
-
-	if err := server.Shutdown(shutdownContext); err != nil {
+	if err != nil {
 		logger.Error(
-			"could not gracefully stop HTTP server",
+			"could not create database pool",
+			"error",
+			err,
+		)
+
+		os.Exit(1)
+	}
+	defer pool.Close()
+
+	if err := pool.Ping(context.Background()); err != nil {
+		logger.Error(
+			"could not connect to database",
 			"error",
 			err,
 		)
@@ -94,19 +48,42 @@ func main() {
 		os.Exit(1)
 	}
 
-	logger.Info("HTTP server stopped")
-}
+	userRepository := user.NewPostgresRepository(pool)
+	authService := auth.NewService(userRepository)
+	authHandler := auth.NewHandler(authService, logger)
 
-func getEnvironmentVariable(name string, defaultValue string) string {
-	value := os.Getenv(name)
+	mux := http.NewServeMux()
 
-	if value == "" {
-		return defaultValue
+	mux.HandleFunc(
+		"GET /health",
+		func(
+			responseWriter http.ResponseWriter,
+			request *http.Request,
+		) {
+			responseWriter.WriteHeader(http.StatusOK)
+			_, _ = responseWriter.Write([]byte(`{"status":"ok"}`))
+		},
+	)
+
+	mux.HandleFunc(
+		"POST /api/v1/auth/register",
+		authHandler.Register,
+	)
+
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: mux,
 	}
 
-	return value
-}
+	logger.Info("starting API", "port", 8080)
 
-func buildAddress(host string, port string) string {
-	return fmt.Sprintf("%s:%s", host, port)
+	if err := server.ListenAndServe(); err != nil {
+		logger.Error(
+			"HTTP server stopped",
+			"error",
+			err,
+		)
+
+		os.Exit(1)
+	}
 }
