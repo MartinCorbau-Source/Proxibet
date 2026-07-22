@@ -1,0 +1,56 @@
+services:
+  database:
+    image: postgres:17-alpine
+    container_name: proxibet-database
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-proxibet}
+      POSTGRES_USER: ${POSTGRES_USER:-proxibet}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-proxibet}
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - proxibet-postgres-data:/var/lib/postgresql/data
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-proxibet} -d ${POSTGRES_DB:-proxibet}"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  api:
+    container_name: proxibet-api
+    build:
+      context: ./proxiback
+      dockerfile: Dockerfile
+
+    restart: unless-stopped
+
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      HTTP_PORT: ${HTTP_PORT:-8080}
+
+      DATABASE_URL: >-
+        postgres://${POSTGRES_USER:-proxibet}:${POSTGRES_PASSWORD:-proxibet}@database:5432/${POSTGRES_DB:-proxibet}?sslmode=disable
+
+      JWT_SECRET: ${JWT_SECRET:-development-secret}
+      ACCESS_TOKEN_DURATION: ${ACCESS_TOKEN_DURATION:-15m}
+      REFRESH_TOKEN_DURATION: ${REFRESH_TOKEN_DURATION:-720h}
+
+    ports:
+      - "${HTTP_PORT:-8080}:8080"
+
+    depends_on:
+      database:
+        condition: service_healthy
+
+volumes:
+  proxibet-postgres-data:
