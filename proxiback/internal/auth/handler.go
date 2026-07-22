@@ -5,7 +5,7 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
-	
+
 	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/user"
 )
 
@@ -27,11 +27,11 @@ func (h *handler) Register(w http.ResponseWriter, r *http.Request) {
 	decoder.DisallowUnknownFields()
 
 	if err := decoder.Decode(&registerRequest); err != nil {
-		h.logger.Error("failed to decode request", err)
+		h.logger.Error("failed to decode request", "error", err)
 		writeError(w, http.StatusBadRequest, "invalid_request", "invalid request")
 		return
 	}
-    response, err := h.authService.Register(r.Context(), registerRequest.Email, registerRequest.Password, registerRequest.DisplayName)
+	response, err := h.authService.Register(r.Context(), registerRequest.Email, registerRequest.Password, registerRequest.DisplayName)
 	switch {
 	case err == nil:
 		writeJSON(
@@ -40,7 +40,7 @@ func (h *handler) Register(w http.ResponseWriter, r *http.Request) {
 			response,
 		)
 
-	case errors.Is(err, user.ErrEmailAlreadyInUse):
+	case errors.Is(err, user.ErrEmailAlreadyInUse), errors.Is(err, user.ErrUserAlreadyExists):
 		writeError(
 			w,
 			http.StatusConflict,
@@ -73,10 +73,7 @@ func (h *handler) Register(w http.ResponseWriter, r *http.Request) {
 		)
 
 	default:
-		h.logger.Error(
-			"failed to register user",
-			err,
-		)
+		h.logger.Error("failed to register user", "error", err)
 
 		writeError(
 			w,
@@ -87,6 +84,60 @@ func (h *handler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (h *handler) Login(w http.ResponseWriter, r *http.Request) {
+	var loginRequest LoginRequest
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+
+	if err := decoder.Decode(&loginRequest); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid_request", "Le corps de la requête est invalide.")
+		return
+	}
+
+	response, err := h.authService.Login(r.Context(), loginRequest.Email, loginRequest.Password)
+	switch {
+	case err == nil:
+		writeJSON(
+			w,
+			http.StatusOK,
+			response,
+		)
+
+	case errors.Is(err, user.ErrUserNotFound), errors.Is(err, user.ErrInvalidCredentials):
+		writeError(
+			w,
+			http.StatusUnauthorized,
+			"INVALID_CREDENTIALS",
+			"L'adresse email ou le mot de passe est incorrect.",
+		)
+
+	case errors.Is(err, ErrInvalidPasswordFormat):
+		writeError(
+			w,
+			http.StatusBadRequest,
+			"INVALID_PASSWORD",
+			"Le mot de passe doit contenir entre 8 et 72 caractères.",
+		)
+
+	case errors.Is(err, user.ErrAccountInactive):
+		writeError(
+			w,
+			http.StatusUnauthorized,
+			"ACCOUNT_DISABLED",
+			"Votre compte a été désactivé.",
+		)
+
+	default:
+		h.logger.Error("failed to login user", "error", err)
+
+		writeError(
+			w,
+			http.StatusInternalServerError,
+			"INTERNAL_ERROR",
+			"Une erreur interne est survenue.",
+		)
+	}
+}
 
 func writeJSON(
 	responseWriter http.ResponseWriter,
@@ -102,7 +153,7 @@ func writeJSON(
 	_ = json.NewEncoder(responseWriter).Encode(value)
 }
 
-func writeError(w http.ResponseWriter,status int,code string, message string) {
+func writeError(w http.ResponseWriter, status int, code string, message string) {
 	writeJSON(w, status, map[string]string{
 		"error":   code,
 		"message": message,

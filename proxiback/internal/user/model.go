@@ -1,15 +1,15 @@
 package user
 
 import (
-	"time"
 	"github.com/google/uuid"
+	"time"
 )
 
 type status string
 
 const (
-	StatusActive     status = "ACTIVE"
-	StatusInactive   status = "INACTIVE"
+	StatusActive   status = "ACTIVE"
+	StatusInactive status = "INACTIVE"
 )
 
 type User struct {

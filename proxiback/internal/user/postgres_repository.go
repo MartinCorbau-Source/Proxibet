@@ -5,10 +5,10 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/google/uuid"
 )
 
 const uniqueViolationCode = "23505"
@@ -24,9 +24,9 @@ func NewPostgresRepository(pool *pgxpool.Pool) *PostgresRepository {
 }
 
 func (repository *PostgresRepository) Create(
-	ctx context.Context, 
+	ctx context.Context,
 	newUser User,
-	) (User, error){
+) (User, error) {
 	query := `
 		INSERT INTO users (
 		id,
@@ -35,7 +35,7 @@ func (repository *PostgresRepository) Create(
 		password_hash,
 		status)
 		VALUES ($1, $2, $3, $4, $5)
-		RETURNING id, display_name, email, status, created_at, updated_at
+		RETURNING id, display_name, email, password_hash, status, created_at, updated_at
 	`
 	var createdUser User
 	err := repository.pool.QueryRow(
@@ -50,6 +50,7 @@ func (repository *PostgresRepository) Create(
 		&createdUser.ID,
 		&createdUser.DisplayName,
 		&createdUser.Email,
+		&createdUser.Password,
 		&createdUser.Status,
 		&createdUser.CreatedAt,
 		&createdUser.UpdatedAt,
@@ -58,7 +59,7 @@ func (repository *PostgresRepository) Create(
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == uniqueViolationCode {
-			return User{}, ErrUserAlreadyExists
+			return User{}, ErrEmailAlreadyInUse
 		}
 		return User{}, fmt.Errorf("cannot create user: %w", err)
 	}
@@ -92,19 +93,25 @@ func (repository *PostgresRepository) FindByID(ctx context.Context, id uuid.UUID
 
 func (repository *PostgresRepository) FindByEmail(ctx context.Context, email string) (User, error) {
 	query := `
-		SELECT id, display_name, email, status, created_at, updated_at
+		SELECT id, display_name, email, password_hash, status, created_at, updated_at
 		FROM users
-		WHERE email = $1
+		WHERE LOWER(email) = LOWER($1)
 	`
 	var foundUser User
 	err := repository.pool.QueryRow(ctx, query, email).Scan(
 		&foundUser.ID,
 		&foundUser.DisplayName,
 		&foundUser.Email,
+		&foundUser.Password,
 		&foundUser.Status,
 		&foundUser.CreatedAt,
 		&foundUser.UpdatedAt,
 	)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return User{}, ErrUserNotFound
+	}
+
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return User{}, ErrUserNotFound
