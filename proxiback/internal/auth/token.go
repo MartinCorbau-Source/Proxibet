@@ -7,11 +7,15 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 
 	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/user"
 )
 
-var ErrMissingJWTSecret = errors.New("missing JWT secret")
+var (
+	ErrMissingJWTSecret   = errors.New("missing JWT secret")
+	ErrInvalidAccessToken = errors.New("invalid access token")
+)
 
 type TokenGenerator struct {
 	secret   []byte
@@ -46,9 +50,7 @@ func NewTokenGenerator(secret, issuer string, duration time.Duration) (*TokenGen
 	}, nil
 }
 
-func (generator *TokenGenerator) Generate(
-	authenticatedUser user.User,
-) (string, time.Time, error) {
+func (generator *TokenGenerator) Generate(authenticatedUser user.User) (string, time.Time, error) {
 	now := time.Now().UTC()
 	expiresAt := now.Add(generator.duration)
 
@@ -64,10 +66,7 @@ func (generator *TokenGenerator) Generate(
 		},
 	}
 
-	token := jwt.NewWithClaims(
-		jwt.SigningMethodHS256,
-		claims,
-	)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	signedToken, err := token.SignedString(generator.secret)
 	if err != nil {
@@ -103,4 +102,34 @@ func (generator *TokenGenerator) ParseAccessToken(tokenString string) (AccessTok
 	}
 
 	return claims, nil
+func (generator *TokenGenerator) Validate(signedToken string) (uuid.UUID, error) {
+	signedToken = strings.TrimSpace(signedToken)
+	if signedToken == "" {
+		return uuid.Nil, ErrInvalidAccessToken
+	}
+
+	claims := &AccessTokenClaims{}
+	token, err := jwt.ParseWithClaims(
+		signedToken,
+		claims,
+		func(token *jwt.Token) (any, error) {
+			if token.Method.Alg() != jwt.SigningMethodHS256.Alg() {
+				return nil, ErrInvalidAccessToken
+			}
+
+			return generator.secret, nil
+		},
+		jwt.WithIssuer(generator.issuer),
+		jwt.WithExpirationRequired(),
+	)
+	if err != nil || token == nil || !token.Valid {
+		return uuid.Nil, ErrInvalidAccessToken
+	}
+
+	userID, err := uuid.Parse(claims.Subject)
+	if err != nil {
+		return uuid.Nil, ErrInvalidAccessToken
+	}
+
+	return userID, nil
 }

@@ -7,6 +7,11 @@ import (
 	"github.com/google/uuid"
 )
 
+type UpdateProfile struct {
+	DisplayName *string
+	Email       *string
+}
+
 type Repository interface {
 	Create(ctx context.Context, user User) (User, error)
 	FindByID(ctx context.Context, id uuid.UUID) (User, error)
@@ -14,4 +19,5 @@ type Repository interface {
 	UpdatePassword(ctx context.Context, id uuid.UUID, passwordHash string) error
 	CreatePasswordResetToken(ctx context.Context, resetToken PasswordResetToken) error
 	ResetPasswordWithToken(ctx context.Context, tokenHash string, passwordHash string, now time.Time) error
+	UpdateProfile(ctx context.Context, id uuid.UUID, update UpdateProfile) (User, error)
 }

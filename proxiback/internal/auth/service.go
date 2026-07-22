@@ -37,8 +37,10 @@ var (
 )
 
 type Service struct {
-	userRepo       user.Repository
-	tokenGenerator *TokenGenerator
+	userRepo             user.Repository
+	refreshTokenRepo     RefreshTokenRepository
+	tokenGenerator       *TokenGenerator
+	refreshTokenDuration time.Duration
 }
 
 type PasswordResetTicket struct {
@@ -48,8 +50,10 @@ type PasswordResetTicket struct {
 
 func NewService(userRepo user.Repository, tokenGenerator *TokenGenerator) *Service {
 	return &Service{
-		userRepo:       userRepo,
-		tokenGenerator: tokenGenerator,
+		userRepo:             userRepo,
+		refreshTokenRepo:     refreshTokenRepo,
+		tokenGenerator:       tokenGenerator,
+		refreshTokenDuration: refreshTokenDuration,
 	}
 }
 
@@ -90,23 +94,33 @@ func (service *Service) Login(ctx context.Context, email, password string) (Logi
 		return LoginResponse{}, fmt.Errorf("failed to get user by email: %w", err)
 	}
 
+	if authenticatedUser.Status != user.StatusActive {
+		return LoginResponse{}, user.ErrAccountInactive
+	}
+
 	if err := bcrypt.CompareHashAndPassword([]byte(authenticatedUser.Password), []byte(password)); err != nil {
 		return LoginResponse{}, user.ErrInvalidCredentials
 	}
 
-	token, expiresAt, err := service.tokenGenerator.Generate(authenticatedUser)
+	accessToken, accessTokenExpiresAt, err := service.tokenGenerator.Generate(authenticatedUser)
 	if err != nil {
 		return LoginResponse{}, fmt.Errorf("failed to generate token: %w", err)
 	}
 
+	plainRefreshToken, refreshToken, err := newRefreshToken(authenticatedUser.ID, service.refreshTokenDuration)
+	if err != nil {
+		return LoginResponse{}, err
+	}
+
+	if _, err := service.refreshTokenRepo.Create(ctx, refreshToken); err != nil {
+		return LoginResponse{}, fmt.Errorf("failed to create refresh token: %w", err)
+	}
+
 	return LoginResponse{
-		AccessToken: token,
-		ExpiresIn:   expiresAt.Unix(),
-		User: UserResponse{
-			ID:          authenticatedUser.ID.String(),
-			DisplayName: authenticatedUser.DisplayName,
-			Email:       authenticatedUser.Email,
-		},
+		AccessToken:  accessToken,
+		RefreshToken: plainRefreshToken,
+		ExpiresIn:    accessTokenExpiresAt.Unix(),
+		User:         newUserResponse(authenticatedUser),
 	}, nil
 }
 
@@ -220,6 +234,55 @@ func (service *Service) ResetPassword(ctx context.Context, resetToken, newPasswo
 	}
 
 	return nil
+func (service *Service) Refresh(ctx context.Context, refreshToken string) (RefreshResponse, error) {
+	refreshToken, err := normalizeRefreshToken(refreshToken)
+	if err != nil {
+		return RefreshResponse{}, err
+	}
+
+	plainNextRefreshToken, nextRefreshToken, err := newRefreshToken(uuid.Nil, service.refreshTokenDuration)
+	if err != nil {
+		return RefreshResponse{}, err
+	}
+
+	rotatedRefreshToken, err := service.refreshTokenRepo.Rotate(
+		ctx,
+		hashRefreshToken(refreshToken),
+		nextRefreshToken,
+		time.Now().UTC(),
+	)
+	if err != nil {
+		return RefreshResponse{}, err
+	}
+
+	authenticatedUser, err := service.userRepo.FindByID(ctx, rotatedRefreshToken.UserID)
+	if err != nil {
+		return RefreshResponse{}, fmt.Errorf("failed to get user by id: %w", err)
+	}
+
+	if authenticatedUser.Status != user.StatusActive {
+		return RefreshResponse{}, user.ErrAccountInactive
+	}
+
+	accessToken, accessTokenExpiresAt, err := service.tokenGenerator.Generate(authenticatedUser)
+	if err != nil {
+		return RefreshResponse{}, fmt.Errorf("failed to generate token: %w", err)
+	}
+
+	return RefreshResponse{
+		AccessToken:  accessToken,
+		RefreshToken: plainNextRefreshToken,
+		ExpiresIn:    accessTokenExpiresAt.Unix(),
+		User:         newUserResponse(authenticatedUser),
+	}, nil
+}
+
+func newUserResponse(authenticatedUser user.User) UserResponse {
+	return UserResponse{
+		ID:          authenticatedUser.ID.String(),
+		DisplayName: authenticatedUser.DisplayName,
+		Email:       authenticatedUser.Email,
+	}
 }
 
 func validateRegisterRequest(email, password, displayName string) error {
@@ -238,6 +301,9 @@ func validateRegisterRequest(email, password, displayName string) error {
 
 func validatePassword(password string) error {
 	passwordLength := len([]byte(password))
+	if passwordLength < MinPasswordLength {
+		return ErrPasswordTooShort
+	}
 
 	if passwordLength < MinPasswordLength {
 		return ErrPasswordTooShort

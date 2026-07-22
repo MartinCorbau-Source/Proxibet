@@ -275,4 +275,45 @@ func (repository *PostgresRepository) ResetPasswordWithToken(
 	}
 
 	return nil
+func (repository *PostgresRepository) UpdateProfile(
+	ctx context.Context,
+	id uuid.UUID,
+	update UpdateProfile,
+) (User, error) {
+	query := `
+		UPDATE users
+		SET display_name = COALESCE($2, display_name),
+			email = COALESCE($3, email),
+			updated_at = NOW()
+		WHERE id = $1
+		RETURNING id, display_name, email, status, created_at, updated_at
+	`
+
+	var updatedUser User
+	err := repository.pool.QueryRow(
+		ctx,
+		query,
+		id,
+		update.DisplayName,
+		update.Email,
+	).Scan(
+		&updatedUser.ID,
+		&updatedUser.DisplayName,
+		&updatedUser.Email,
+		&updatedUser.Status,
+		&updatedUser.CreatedAt,
+		&updatedUser.UpdatedAt,
+	)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == uniqueViolationCode {
+			return User{}, ErrEmailAlreadyInUse
+		}
+		if errors.Is(err, pgx.ErrNoRows) {
+			return User{}, ErrUserNotFound
+		}
+		return User{}, fmt.Errorf("cannot update user profile: %w", err)
+	}
+
+	return updatedUser, nil
 }
