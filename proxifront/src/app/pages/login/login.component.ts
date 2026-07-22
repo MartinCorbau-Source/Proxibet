@@ -49,7 +49,7 @@ export class LoginComponent {
     this.authService.login(email, password).subscribe({
       next: () => {
         this.loading.set(false);
-        this.router.navigate(['/']);
+        this.router.navigate(['/me']);
       },
       error: (error: HttpErrorResponse) => {
         this.loading.set(false);
