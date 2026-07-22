@@ -42,6 +42,8 @@ services:
         postgres://${POSTGRES_USER:-proxibet}:${POSTGRES_PASSWORD:-proxibet}@database:5432/${POSTGRES_DB:-proxibet}?sslmode=disable
 
       JWT_SECRET: ${JWT_SECRET:-development-secret}
+      JWT_ISSUER: proxibet-api
+      JWT_DURATION: 1h
       ACCESS_TOKEN_DURATION: ${ACCESS_TOKEN_DURATION:-15m}
       REFRESH_TOKEN_DURATION: ${REFRESH_TOKEN_DURATION:-720h}
 
