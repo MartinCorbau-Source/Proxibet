@@ -10,11 +10,26 @@ html {
   @include mat.theme(
     (
       color: (
-        primary: mat.$cyan-palette,
-        tertiary: mat.$orange-palette,
+        primary: mat.$chartreuse-palette,
+        tertiary: mat.$violet-palette,
       ),
       typography: Roboto,
       density: 0,
+    )
+  );
+}
+
+// Overrides globales des tokens M3 par composant (boutons, cards, etc.)
+// Liste complète des tokens disponibles par composant :
+// https://material.angular.dev/components/{button,card,...}/styling
+html {
+  @include mat.theme-overrides(
+    (
+      button-filled-container-shape: 8px,
+      button-outlined-container-shape: 8px,
+      button-tonal-container-shape: 8px,
+      card-elevated-container-shape: 16px,
+      card-outlined-container-shape: 16px,
     )
   );
 }
