@@ -5,8 +5,10 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
-	"time"
+	"path"
+	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -93,6 +95,28 @@ func main() {
 		authHandler.Register,
 	)
 
+	mux.HandleFunc(
+		"POST /api/v1/auth/login",
+		authHandler.Login,
+	)
+
+	mux.HandleFunc(
+		"POST /api/v1/auth/forgot-password",
+		authHandler.ForgotPassword,
+	)
+
+	mux.HandleFunc(
+		"POST /api/v1/auth/reset-password",
+		authHandler.ResetPassword,
+	)
+
+	mux.HandleFunc(
+		"PATCH /api/v1/auth/password",
+		authHandler.ChangePassword,
+	)
+
+	registerStaticFrontend(mux, logger)
+
 	allowedOrigins := []string{"http://localhost:6767"}
 	if corsAllowedOrigins := os.Getenv("CORS_ALLOWED_ORIGINS"); corsAllowedOrigins != "" {
 		allowedOrigins = strings.Split(corsAllowedOrigins, ",")
@@ -102,12 +126,6 @@ func main() {
 		Addr:    ":8080",
 		Handler: httpx.CORSMiddleware(allowedOrigins)(mux),
 	}
-
-	mux.HandleFunc(
-		"POST /api/v1/auth/login",
-		authHandler.Login,
-	)
-
 	logger.Info("starting API", "port", 8080)
 
 	if err := server.ListenAndServe(); err != nil {
@@ -119,6 +137,52 @@ func main() {
 
 		os.Exit(1)
 	}
+}
+
+func registerStaticFrontend(mux *http.ServeMux, logger *slog.Logger) {
+	staticDir := os.Getenv("STATIC_DIR")
+	if staticDir == "" {
+		return
+	}
+
+	indexPath := filepath.Join(staticDir, "index.html")
+	if _, err := os.Stat(indexPath); err != nil {
+		logger.Warn(
+			"frontend static files unavailable",
+			"dir",
+			staticDir,
+			"error",
+			err,
+		)
+
+		return
+	}
+
+	fileServer := http.FileServer(http.Dir(staticDir))
+	mux.HandleFunc(
+		"GET /",
+		func(
+			responseWriter http.ResponseWriter,
+			request *http.Request,
+		) {
+			cleanPath := strings.TrimPrefix(path.Clean("/"+request.URL.Path), "/")
+			filePath := filepath.Join(staticDir, filepath.FromSlash(cleanPath))
+
+			if fileInfo, err := os.Stat(filePath); err == nil && !fileInfo.IsDir() {
+				fileServer.ServeHTTP(responseWriter, request)
+
+				return
+			}
+
+			if path.Ext(cleanPath) != "" {
+				http.NotFound(responseWriter, request)
+
+				return
+			}
+
+			http.ServeFile(responseWriter, request, indexPath)
+		},
+	)
 }
 
 func jwtDurationFromEnv() time.Duration {

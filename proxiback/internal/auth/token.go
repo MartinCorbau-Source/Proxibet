@@ -76,3 +76,31 @@ func (generator *TokenGenerator) Generate(
 
 	return signedToken, expiresAt, nil
 }
+
+func (generator *TokenGenerator) ParseAccessToken(tokenString string) (AccessTokenClaims, error) {
+	claims := AccessTokenClaims{}
+
+	parsedToken, err := jwt.ParseWithClaims(
+		tokenString,
+		&claims,
+		func(token *jwt.Token) (any, error) {
+			return generator.secret, nil
+		},
+		jwt.WithExpirationRequired(),
+		jwt.WithIssuer(generator.issuer),
+		jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}),
+	)
+	if err != nil {
+		if errors.Is(err, jwt.ErrTokenExpired) {
+			return AccessTokenClaims{}, user.ErrTokenExpired
+		}
+
+		return AccessTokenClaims{}, user.ErrInvalidToken
+	}
+
+	if !parsedToken.Valid || claims.Subject == "" {
+		return AccessTokenClaims{}, user.ErrInvalidToken
+	}
+
+	return claims, nil
+}
