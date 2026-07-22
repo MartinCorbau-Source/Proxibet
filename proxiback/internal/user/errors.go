@@ -9,4 +9,5 @@ var (
 	ErrInvalidUserEmail = errors.New("invalid user email")
 	ErrEmailAlreadyInUse = errors.New("email already in use")
 	ErrMissingPassword = errors.New("password cannot be empty")
+	ErrInvalidDisplayName = errors.New("invalid display name")
 )

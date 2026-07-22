@@ -6,8 +6,6 @@ CREATE TABLE users
     display_name VARCHAR(100) NOT NULL,
     password_hash TEXT NOT NULL,
 
-    avatar_url TEXT NULL,
-
     status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

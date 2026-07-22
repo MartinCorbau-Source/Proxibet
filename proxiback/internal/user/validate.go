@@ -6,15 +6,6 @@ import (
 	"strings"
 )
 
-var (
-	ErrInvalidUserEmail = errors.New("invalid user email")
-	ErrEmailAlreadyInUse = errors.New("email already in use")
-	ErrInvalidUserStatus = errors.New("invalid user status")
-	ErrUserNotFound = errors.New("user not found")
-	ErrMissingPassword = errors.New("password cannot be empty")
-	ErrUserAlreadyExists = errors.New("user already exists")
-)
-
 func Validate(user User) error {
 
 	if err := ValidateEmail(user.Email); err != nil {
@@ -31,7 +22,7 @@ func Validate(user User) error {
 	}
 
 	switch user.Status {
-	case active, inactive:
+	case StatusActive, StatusInactive:
 		return nil
 	default:
 		return ErrInvalidUserStatus
