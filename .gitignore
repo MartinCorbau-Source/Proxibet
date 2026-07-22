@@ -30,3 +30,19 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# ---> Angular (proxibet-front)
+/proxibet-front/node_modules
+/proxibet-front/dist
+/proxibet-front/.angular/cache
+/proxibet-front/npm-debug.log
+/proxibet-front/yarn-error.log
+
+# Angular templates/CLI generated
+/proxibet-front/tmp
+/proxibet-front/out-tsc
+/proxibet-front/bazel-out
+
+# System files
+.DS_Store
+Thumbs.db
