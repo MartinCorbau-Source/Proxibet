@@ -28,6 +28,7 @@ html {
       filled-container-shape: 8px,
       outlined-container-shape: 8px,
       tonal-container-shape: 8px,
+      text-container-shape: 8px,
     )
   );
   @include mat.card-overrides(
