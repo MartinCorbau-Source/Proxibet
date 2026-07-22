@@ -23,13 +23,17 @@ html {
 // Liste complète des tokens disponibles par composant :
 // https://material.angular.dev/components/{button,card,...}/styling
 html {
-  @include mat.theme-overrides(
+  @include mat.button-overrides(
     (
-      button-filled-container-shape: 8px,
-      button-outlined-container-shape: 8px,
-      button-tonal-container-shape: 8px,
-      card-elevated-container-shape: 16px,
-      card-outlined-container-shape: 16px,
+      filled-container-shape: 8px,
+      outlined-container-shape: 8px,
+      tonal-container-shape: 8px,
+    )
+  );
+  @include mat.card-overrides(
+    (
+      elevated-container-shape: 8px,
+      outlined-container-shape: 16px,
     )
   );
 }
