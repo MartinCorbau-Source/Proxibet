@@ -5,14 +5,17 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
-	"time"
 	"strings"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/auth"
+	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/database"
 	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/httpx"
+	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/profile"
 	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/user"
+	"github.com/MartinCorbau-Source/proxibet/proxiback/migrations"
 )
 
 func main() {
@@ -44,7 +47,7 @@ func main() {
 	tokenGenerator, err := auth.NewTokenGenerator(
 		os.Getenv("JWT_SECRET"),
 		os.Getenv("JWT_ISSUER"),
-		jwtDurationFromEnv(),
+		accessTokenDurationFromEnv(),
 	)
 	if err != nil {
 		logger.Error(
@@ -66,14 +69,29 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err := database.Migrate(context.Background(), pool, migrations.Files, logger); err != nil {
+		logger.Error(
+			"could not apply database migrations",
+			"error",
+			err,
+		)
+
+		os.Exit(1)
+	}
+
 	userRepository := user.NewPostgresRepository(pool)
+	refreshTokenRepository := auth.NewPostgresRefreshTokenRepository(pool)
 
 	authService := auth.NewService(
 		userRepository,
+		refreshTokenRepository,
 		tokenGenerator,
+		refreshTokenDurationFromEnv(),
 	)
 
 	authHandler := auth.NewHandler(authService, logger)
+	profileHandler := profile.NewHandler(userRepository, logger)
+	requireAuth := auth.NewAuthenticationMiddleware(tokenGenerator)
 
 	mux := http.NewServeMux()
 
@@ -93,20 +111,30 @@ func main() {
 		authHandler.Register,
 	)
 
-	allowedOrigins := []string{"http://localhost:6767"}
-	if corsAllowedOrigins := os.Getenv("CORS_ALLOWED_ORIGINS"); corsAllowedOrigins != "" {
-		allowedOrigins = strings.Split(corsAllowedOrigins, ",")
-	}
-
-	server := &http.Server{
-		Addr:    ":8080",
-		Handler: httpx.CORSMiddleware(allowedOrigins)(mux),
-	}
-
 	mux.HandleFunc(
 		"POST /api/v1/auth/login",
 		authHandler.Login,
 	)
+
+	mux.HandleFunc(
+		"POST /api/v1/auth/refresh",
+		authHandler.Refresh,
+	)
+
+	mux.Handle(
+		"GET /api/v1/me",
+		requireAuth(http.HandlerFunc(profileHandler.GetMe)),
+	)
+
+	mux.Handle(
+		"PATCH /api/v1/me",
+		requireAuth(http.HandlerFunc(profileHandler.UpdateMe)),
+	)
+
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: httpx.CORSMiddleware(corsAllowedOriginsFromEnv())(mux),
+	}
 
 	logger.Info("starting API", "port", 8080)
 
@@ -121,8 +149,46 @@ func main() {
 	}
 }
 
-func jwtDurationFromEnv() time.Duration {
-	durationStr := os.Getenv("JWT_DURATION")
+func corsAllowedOriginsFromEnv() []string {
+	corsAllowedOrigins := os.Getenv("CORS_ALLOWED_ORIGINS")
+	if corsAllowedOrigins == "" {
+		return []string{"http://localhost:6767"}
+	}
+
+	origins := strings.Split(corsAllowedOrigins, ",")
+	allowedOrigins := make([]string, 0, len(origins))
+	for _, origin := range origins {
+		origin = strings.TrimSpace(origin)
+		if origin != "" {
+			allowedOrigins = append(allowedOrigins, origin)
+		}
+	}
+
+	if len(allowedOrigins) == 0 {
+		return []string{"http://localhost:6767"}
+	}
+
+	return allowedOrigins
+}
+
+func accessTokenDurationFromEnv() time.Duration {
+	if duration := durationFromEnv("ACCESS_TOKEN_DURATION"); duration > 0 {
+		return duration
+	}
+
+	return durationFromEnv("JWT_DURATION")
+}
+
+func refreshTokenDurationFromEnv() time.Duration {
+	if duration := durationFromEnv("REFRESH_TOKEN_DURATION"); duration > 0 {
+		return duration
+	}
+
+	return 30 * 24 * time.Hour
+}
+
+func durationFromEnv(name string) time.Duration {
+	durationStr := os.Getenv(name)
 	if durationStr == "" {
 		return 0
 	}

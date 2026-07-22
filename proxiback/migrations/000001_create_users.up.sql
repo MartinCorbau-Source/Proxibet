@@ -1,4 +1,4 @@
-CREATE TABLE users
+CREATE TABLE IF NOT EXISTS users
 (
     id UUID PRIMARY KEY,
 
@@ -15,5 +15,5 @@ CREATE TABLE users
         CHECK (status IN ('ACTIVE', 'DISABLED'))
 );
 
-CREATE UNIQUE INDEX users_email_unique
+CREATE UNIQUE INDEX IF NOT EXISTS users_email_unique
     ON users (LOWER(email));
