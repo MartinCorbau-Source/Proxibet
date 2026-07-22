@@ -1,23 +1,32 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { Observable, tap, throwError } from 'rxjs';
 
 import { environment } from '../../environments/environment';
 import {
   AuthenticatedUser,
   LoginRequest,
   LoginResponse,
+  RefreshRequest,
+  RefreshResponse,
   RegisterRequest,
   RegisterResponse,
 } from './auth.models';
+import { CurrentUserStore } from './current-user.store';
+import { TokenStorageService } from './token-storage.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
+  private readonly tokenStorage = inject(TokenStorageService);
+  private readonly currentUserStore = inject(CurrentUserStore);
 
-  private readonly _currentUser = signal<AuthenticatedUser | null>(null);
-  readonly currentUser = this._currentUser.asReadonly();
-  readonly isAuthenticated = computed(() => this._currentUser() !== null);
+  readonly currentUser = this.currentUserStore.user;
+  readonly isAuthenticated = this.currentUserStore.isAuthenticated;
+
+  constructor() {
+    this.currentUserStore.set(this.tokenStorage.load()?.user ?? null);
+  }
 
   register(displayName: string, email: string, password: string): Observable<RegisterResponse> {
     const request: RegisterRequest = {
@@ -34,11 +43,44 @@ export class AuthService {
 
     return this.http
       .post<LoginResponse>(`${environment.apiUrl}/api/v1/auth/login`, request)
-      .pipe(tap((response) => this._currentUser.set(response.user)));
+      .pipe(tap((response) => this.applySession(response)));
+  }
+
+  refresh(): Observable<RefreshResponse> {
+    const stored = this.tokenStorage.load();
+    if (!stored) {
+      return throwError(() => new Error('No refresh token available'));
+    }
+
+    const request: RefreshRequest = { refresh_token: stored.refreshToken };
+
+    return this.http
+      .post<RefreshResponse>(`${environment.apiUrl}/api/v1/auth/refresh`, request)
+      .pipe(tap((response) => this.applySession(response)));
   }
 
   logout(): void {
-    this._currentUser.set(null);
-    // TODO: appeler un futur POST /api/v1/auth/logout pour invalider le cookie côté serveur
+    this.tokenStorage.clear();
+    this.currentUserStore.clear();
+    // Pas d'endpoint de logout côté backend pour l'instant : le refresh token
+    // reste valide côté serveur jusqu'à expiration naturelle ou rotation.
+  }
+
+  getAccessToken(): string | null {
+    return this.tokenStorage.load()?.accessToken ?? null;
+  }
+
+  getMe(): Observable<AuthenticatedUser> {
+    return this.http.get<AuthenticatedUser>(`${environment.apiUrl}/api/v1/me`);
+  }
+
+  private applySession(response: LoginResponse | RefreshResponse): void {
+    this.tokenStorage.save({
+      accessToken: response.access_token,
+      refreshToken: response.refresh_token,
+      expiresAt: response.expires_in,
+      user: response.user,
+    });
+    this.currentUserStore.set(response.user);
   }
 }
