@@ -14,6 +14,7 @@ npm start
 ## Back (Golang)
 
 ```
-docker compose up --build -d 
-Get-Content .\proxiback\migrations\000001_create_users.up.sql | docker compose exec -T database psql -U proxibet -d proxibet
+docker compose up --build -d
 ```
+
+Les migrations SQL presentes dans `proxiback/migrations` sont appliquees automatiquement au demarrage de l'API.
