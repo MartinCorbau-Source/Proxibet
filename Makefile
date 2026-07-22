@@ -64,6 +64,7 @@ run: ## Lance l'API localement avec Go
 	APP_ENV=development \
 	HTTP_PORT=8080 \
 	DATABASE_URL="$(LOCAL_DATABASE_URL)" \
+	CORS_ALLOWED_ORIGINS=http://localhost:6767 \
 	$(GO) run $(MAIN_PACKAGE)
 
 .PHONY: clean

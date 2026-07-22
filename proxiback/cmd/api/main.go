@@ -5,11 +5,13 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/auth"
-	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/user"	
+	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/httpx"
+	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/user"
 )
 
 func main() {
@@ -70,9 +72,14 @@ func main() {
 		authHandler.Register,
 	)
 
+	allowedOrigins := []string{"http://localhost:6767"}
+	if corsAllowedOrigins := os.Getenv("CORS_ALLOWED_ORIGINS"); corsAllowedOrigins != "" {
+		allowedOrigins = strings.Split(corsAllowedOrigins, ",")
+	}
+
 	server := &http.Server{
 		Addr:    ":8080",
-		Handler: mux,
+		Handler: httpx.CORSMiddleware(allowedOrigins)(mux),
 	}
 
 	logger.Info("starting API", "port", 8080)
