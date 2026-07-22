@@ -18,9 +18,9 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	AccessToken string `json:"access_token"`
-	ExpiresIn   int64  `json:"expires_in"`
-	User UserResponse `json:"user"`
+	AccessToken string       `json:"access_token"`
+	ExpiresIn   int64        `json:"expires_in"`
+	User        UserResponse `json:"user"`
 }
 
 type UserResponse struct {

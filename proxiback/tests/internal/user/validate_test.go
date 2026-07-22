@@ -1,10 +1,12 @@
-package user
+package user_test
 
 import (
 	"errors"
 	"testing"
 
 	"github.com/google/uuid"
+
+	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/user"
 )
 
 func TestValidateUser(t *testing.T) {
@@ -12,50 +14,50 @@ func TestValidateUser(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		user    User
+		user    user.User
 		wantErr error
 	}{
 		{
 			name: "valid user",
-			user: User{
-				ID:           uuid.New(),
-				Email:        "martin@example.com",
-				DisplayName:  "Martin",
-				PasswordHash: "hashed-password",
-				Status:       StatusActive,
+			user: user.User{
+				ID:          uuid.New(),
+				Email:       "martin@example.com",
+				DisplayName: "Martin",
+				Password:    "hashed-password",
+				Status:      user.StatusActive,
 			},
 		},
 		{
 			name: "invalid email",
-			user: User{
-				ID:           uuid.New(),
-				Email:        "invalid-email",
-				DisplayName:  "Martin",
-				PasswordHash: "hashed-password",
-				Status:       StatusActive,
+			user: user.User{
+				ID:          uuid.New(),
+				Email:       "invalid-email",
+				DisplayName: "Martin",
+				Password:    "hashed-password",
+				Status:      user.StatusActive,
 			},
-			wantErr: ErrInvalidEmail,
+			wantErr: user.ErrInvalidUserEmail,
 		},
 		{
 			name: "display name too short",
-			user: User{
-				ID:           uuid.New(),
-				Email:        "martin@example.com",
-				DisplayName:  "M",
-				PasswordHash: "hashed-password",
-				Status:       StatusActive,
+			user: user.User{
+				ID:          uuid.New(),
+				Email:       "martin@example.com",
+				DisplayName: "M",
+				Password:    "hashed-password",
+				Status:      user.StatusActive,
 			},
-			wantErr: ErrInvalidDisplayName,
+			wantErr: user.ErrInvalidDisplayName,
 		},
 		{
 			name: "missing password hash",
-			user: User{
+			user: user.User{
 				ID:          uuid.New(),
 				Email:       "martin@example.com",
 				DisplayName: "Martin",
-				Status:      StatusActive,
+				Status:      user.StatusActive,
 			},
-			wantErr: ErrMissingPasswordHash,
+			wantErr: user.ErrMissingPassword,
 		},
 	}
 
@@ -65,7 +67,7 @@ func TestValidateUser(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 
-			err := Validate(test.user)
+			err := user.Validate(test.user)
 
 			if !errors.Is(err, test.wantErr) {
 				t.Fatalf(

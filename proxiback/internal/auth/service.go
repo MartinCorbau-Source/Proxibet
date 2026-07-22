@@ -20,21 +20,23 @@ const (
 )
 
 var (
-	ErrInvalidEmailFormat = errors.New("invalid email format")
-	ErrInvalidPasswordFormat = errors.New("invalid password format")
+	ErrInvalidEmailFormat       = errors.New("invalid email format")
+	ErrInvalidPasswordFormat    = errors.New("invalid password format")
 	ErrInvalidDisplayNameFormat = errors.New("invalid display name format")
-	ErrInvalidDisplayName = errors.New("Invalid display name")
-	ErrPasswordTooShort   = fmt.Errorf("password must be at least %d characters long", MinPasswordLength)
-	ErrPasswordTooLong    = fmt.Errorf("password must be at most %d characters long", MaxPasswordLength)
+	ErrInvalidDisplayName       = errors.New("Invalid display name")
+	ErrPasswordTooShort         = fmt.Errorf("password must be at least %d characters long", MinPasswordLength)
+	ErrPasswordTooLong          = fmt.Errorf("password must be at most %d characters long", MaxPasswordLength)
 )
 
 type Service struct {
-	userRepo user.Repository
+	userRepo       user.Repository
+	tokenGenerator *TokenGenerator
 }
 
-func NewService(userRepo user.Repository) *Service {
+func NewService(userRepo user.Repository, tokenGenerator *TokenGenerator) *Service {
 	return &Service{
-		userRepo: userRepo,
+		userRepo:       userRepo,
+		tokenGenerator: tokenGenerator,
 	}
 }
 
@@ -52,11 +54,11 @@ func (service *Service) Register(ctx context.Context, email, password, displayNa
 	}
 
 	newUser := user.User{
-		ID:           uuid.New(),
-		DisplayName:  displayName,
-		Email:        email,
-		Password: string(passwordHash),
-		Status:       user.StatusActive,
+		ID:          uuid.New(),
+		DisplayName: displayName,
+		Email:       email,
+		Password:    string(passwordHash),
+		Status:      user.StatusActive,
 	}
 
 	createdUser, err := service.userRepo.Create(ctx, newUser)
@@ -67,7 +69,35 @@ func (service *Service) Register(ctx context.Context, email, password, displayNa
 	return RegisterResponse{ID: createdUser.ID.String(), DisplayName: createdUser.DisplayName, Email: createdUser.Email}, nil
 }
 
-func validateRegisterRequest(email, password, displayName string, ) error {
+func (service *Service) Login(ctx context.Context, email, password string) (LoginResponse, error) {
+	email = user.NormalizeEmail(email)
+
+	authenticatedUser, err := service.userRepo.FindByEmail(ctx, email)
+	if err != nil {
+		return LoginResponse{}, fmt.Errorf("failed to get user by email: %w", err)
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(authenticatedUser.Password), []byte(password)); err != nil {
+		return LoginResponse{}, user.ErrInvalidCredentials
+	}
+
+	token, expiresAt, err := service.tokenGenerator.Generate(authenticatedUser)
+	if err != nil {
+		return LoginResponse{}, fmt.Errorf("failed to generate token: %w", err)
+	}
+
+	return LoginResponse{
+		AccessToken: token,
+		ExpiresIn:   expiresAt.Unix(),
+		User: UserResponse{
+			ID:          authenticatedUser.ID.String(),
+			DisplayName: authenticatedUser.DisplayName,
+			Email:       authenticatedUser.Email,
+		},
+	}, nil
+}
+
+func validateRegisterRequest(email, password, displayName string) error {
 	if err := validateEmail(email); err != nil {
 		return err
 	}

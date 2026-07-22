@@ -5,11 +5,12 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/auth"
-	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/user"	
+	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/user"
 )
 
 func main() {
@@ -38,6 +39,21 @@ func main() {
 	}
 	defer pool.Close()
 
+	tokenGenerator, err := auth.NewTokenGenerator(
+		os.Getenv("JWT_SECRET"),
+		os.Getenv("JWT_ISSUER"),
+		jwtDurationFromEnv(),
+	)
+	if err != nil {
+		logger.Error(
+			"could not create token generator",
+			"error",
+			err,
+		)
+
+		os.Exit(1)
+	}
+
 	if err := pool.Ping(context.Background()); err != nil {
 		logger.Error(
 			"could not connect to database",
@@ -49,7 +65,12 @@ func main() {
 	}
 
 	userRepository := user.NewPostgresRepository(pool)
-	authService := auth.NewService(userRepository)
+
+	authService := auth.NewService(
+		userRepository,
+		tokenGenerator,
+	)
+
 	authHandler := auth.NewHandler(authService, logger)
 
 	mux := http.NewServeMux()
@@ -75,6 +96,11 @@ func main() {
 		Handler: mux,
 	}
 
+	mux.HandleFunc(
+		"POST /api/v1/auth/login",
+		authHandler.Login,
+	)
+
 	logger.Info("starting API", "port", 8080)
 
 	if err := server.ListenAndServe(); err != nil {
@@ -86,4 +112,18 @@ func main() {
 
 		os.Exit(1)
 	}
+}
+
+func jwtDurationFromEnv() time.Duration {
+	durationStr := os.Getenv("JWT_DURATION")
+	if durationStr == "" {
+		return 0
+	}
+
+	duration, err := time.ParseDuration(durationStr)
+	if err != nil {
+		return 0
+	}
+
+	return duration
 }

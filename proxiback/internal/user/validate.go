@@ -1,7 +1,6 @@
 package user
 
 import (
-	"errors"
 	"net/mail"
 	"strings"
 )
@@ -14,7 +13,7 @@ func Validate(user User) error {
 
 	displayNameLength := len([]rune(strings.TrimSpace(user.DisplayName)))
 	if displayNameLength < 2 || displayNameLength > 100 {
-		return errors.New("invalid display name")
+		return ErrInvalidDisplayName
 	}
 
 	if strings.TrimSpace(user.Password) == "" {
