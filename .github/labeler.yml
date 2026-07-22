@@ -1,0 +1,21 @@
+backend:
+  - changed-files:
+    - any-glob-to-any-file: 'proxiback/**'
+
+frontend:
+  - changed-files:
+    - any-glob-to-any-file: 'proxifront/**'
+
+database:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'proxiback/migrations/**'
+      - 'docker-compose.yml'
+
+ci:
+  - changed-files:
+    - any-glob-to-any-file: '.github/**'
+
+documentation:
+  - changed-files:
+    - any-glob-to-any-file: '**/*.md'
