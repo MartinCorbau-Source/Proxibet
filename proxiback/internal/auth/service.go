@@ -2,6 +2,10 @@ package auth
 
 import (
 	"context"
+	"crypto/rand"
+	"crypto/sha256"
+	"encoding/base64"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"net/mail"
@@ -18,6 +22,9 @@ import (
 const (
 	MinPasswordLength = 8
 	MaxPasswordLength = 72
+
+	PasswordResetTokenByteLength = 32
+	PasswordResetTokenDuration   = time.Hour
 )
 
 var (
@@ -34,6 +41,11 @@ type Service struct {
 	refreshTokenRepo     RefreshTokenRepository
 	tokenGenerator       *TokenGenerator
 	refreshTokenDuration time.Duration
+}
+
+type PasswordResetTicket struct {
+	Token     string
+	ExpiresAt time.Time
 }
 
 func NewService(
@@ -117,6 +129,118 @@ func (service *Service) Login(ctx context.Context, email, password string) (Logi
 	}, nil
 }
 
+func (service *Service) ChangePassword(ctx context.Context, accessToken, currentPassword, newPassword string) error {
+	claims, err := service.tokenGenerator.ParseAccessToken(accessToken)
+	if err != nil {
+		return err
+	}
+
+	userID, err := uuid.Parse(claims.Subject)
+	if err != nil {
+		return user.ErrInvalidToken
+	}
+
+	if err := validatePassword(newPassword); err != nil {
+		return err
+	}
+
+	authenticatedUser, err := service.userRepo.FindByID(ctx, userID)
+	if err != nil {
+		return fmt.Errorf("failed to get user by id: %w", err)
+	}
+
+	if authenticatedUser.Status != user.StatusActive {
+		return user.ErrAccountInactive
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(authenticatedUser.Password), []byte(currentPassword)); err != nil {
+		return user.ErrInvalidCredentials
+	}
+
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return fmt.Errorf("failed to hash password: %w", err)
+	}
+
+	if err := service.userRepo.UpdatePassword(ctx, userID, string(passwordHash)); err != nil {
+		return fmt.Errorf("failed to update password: %w", err)
+	}
+
+	return nil
+}
+
+func (service *Service) RequestPasswordReset(ctx context.Context, email string) (PasswordResetTicket, error) {
+	email = user.NormalizeEmail(email)
+	if err := validateEmail(email); err != nil {
+		return PasswordResetTicket{}, err
+	}
+
+	foundUser, err := service.userRepo.FindByEmail(ctx, email)
+	if err != nil {
+		if errors.Is(err, user.ErrUserNotFound) {
+			return PasswordResetTicket{}, nil
+		}
+
+		return PasswordResetTicket{}, fmt.Errorf("failed to get user by email: %w", err)
+	}
+
+	if foundUser.Status != user.StatusActive {
+		return PasswordResetTicket{}, nil
+	}
+
+	resetToken, err := generatePasswordResetToken()
+	if err != nil {
+		return PasswordResetTicket{}, err
+	}
+
+	now := time.Now().UTC()
+	expiresAt := now.Add(PasswordResetTokenDuration)
+
+	err = service.userRepo.CreatePasswordResetToken(ctx, user.PasswordResetToken{
+		ID:        uuid.New(),
+		UserID:    foundUser.ID,
+		TokenHash: hashPasswordResetToken(resetToken),
+		ExpiresAt: expiresAt,
+		CreatedAt: now,
+	})
+	if err != nil {
+		return PasswordResetTicket{}, fmt.Errorf("failed to create password reset token: %w", err)
+	}
+
+	return PasswordResetTicket{
+		Token:     resetToken,
+		ExpiresAt: expiresAt,
+	}, nil
+}
+
+func (service *Service) ResetPassword(ctx context.Context, resetToken, newPassword string) error {
+	resetToken = strings.TrimSpace(resetToken)
+	if resetToken == "" {
+		return user.ErrInvalidPasswordResetToken
+	}
+
+	if err := validatePassword(newPassword); err != nil {
+		return err
+	}
+
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return fmt.Errorf("failed to hash password: %w", err)
+	}
+
+	err = service.userRepo.ResetPasswordWithToken(
+		ctx,
+		hashPasswordResetToken(resetToken),
+		string(passwordHash),
+		time.Now().UTC(),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to reset password: %w", err)
+	}
+
+	return nil
+}
+
 func (service *Service) Refresh(ctx context.Context, refreshToken string) (RefreshResponse, error) {
 	refreshToken, err := normalizeRefreshToken(refreshToken)
 	if err != nil {
@@ -179,7 +303,15 @@ func validateRegisterRequest(email, password, displayName string) error {
 		return ErrInvalidDisplayName
 	}
 
+	return validatePassword(password)
+}
+
+func validatePassword(password string) error {
 	passwordLength := len([]byte(password))
+	if passwordLength < MinPasswordLength {
+		return ErrPasswordTooShort
+	}
+
 	if passwordLength < MinPasswordLength {
 		return ErrPasswordTooShort
 	}
@@ -210,4 +342,18 @@ func validateEmail(email string) error {
 	}
 
 	return nil
+}
+
+func generatePasswordResetToken() (string, error) {
+	tokenBytes := make([]byte, PasswordResetTokenByteLength)
+	if _, err := rand.Read(tokenBytes); err != nil {
+		return "", fmt.Errorf("generate password reset token: %w", err)
+	}
+
+	return base64.RawURLEncoding.EncodeToString(tokenBytes), nil
+}
+
+func hashPasswordResetToken(resetToken string) string {
+	tokenHash := sha256.Sum256([]byte(resetToken))
+	return hex.EncodeToString(tokenHash[:])
 }

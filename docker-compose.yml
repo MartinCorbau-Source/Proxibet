@@ -29,8 +29,8 @@ services:
   api:
     container_name: proxibet-api
     build:
-      context: ./proxiback
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: proxiback/Dockerfile
 
     restart: unless-stopped
 
