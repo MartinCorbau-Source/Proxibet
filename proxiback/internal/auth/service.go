@@ -48,7 +48,12 @@ type PasswordResetTicket struct {
 	ExpiresAt time.Time
 }
 
-func NewService(userRepo user.Repository, tokenGenerator *TokenGenerator) *Service {
+func NewService(
+	userRepo user.Repository,
+	refreshTokenRepo RefreshTokenRepository,
+	tokenGenerator *TokenGenerator,
+	refreshTokenDuration time.Duration,
+) *Service {
 	return &Service{
 		userRepo:             userRepo,
 		refreshTokenRepo:     refreshTokenRepo,
@@ -234,6 +239,8 @@ func (service *Service) ResetPassword(ctx context.Context, resetToken, newPasswo
 	}
 
 	return nil
+}
+
 func (service *Service) Refresh(ctx context.Context, refreshToken string) (RefreshResponse, error) {
 	refreshToken, err := normalizeRefreshToken(refreshToken)
 	if err != nil {
