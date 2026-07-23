@@ -31,6 +31,35 @@ html {
       text-container-shape: 8px,
     )
   );
+
+  // Variant "tertiary" réutilisable partout, quel que soit l'appearance
+  // (text par défaut, outlined, filled, tonal, elevated) :
+  // <button matButton class="mat-button-tertiary">
+  .mat-button-tertiary {
+    @include mat.button-overrides(
+      (
+        text-label-text-color: var(--mat-sys-tertiary),
+        text-state-layer-color: var(--mat-sys-tertiary),
+        text-ripple-color: var(--mat-sys-tertiary),
+        outlined-label-text-color: var(--mat-sys-tertiary),
+        outlined-outline-color: var(--mat-sys-tertiary),
+        outlined-state-layer-color: var(--mat-sys-tertiary),
+        outlined-ripple-color: var(--mat-sys-tertiary),
+        tonal-container-color: var(--mat-sys-tertiary-container),
+        tonal-label-text-color: var(--mat-sys-on-tertiary-container),
+        tonal-state-layer-color: var(--mat-sys-on-tertiary-container),
+        tonal-ripple-color: var(--mat-sys-on-tertiary-container),
+        filled-container-color: var(--mat-sys-tertiary),
+        filled-label-text-color: var(--mat-sys-on-tertiary),
+        filled-state-layer-color: var(--mat-sys-on-tertiary),
+        filled-ripple-color: var(--mat-sys-on-tertiary),
+        protected-container-color: var(--mat-sys-tertiary),
+        protected-label-text-color: var(--mat-sys-on-tertiary),
+        protected-state-layer-color: var(--mat-sys-on-tertiary),
+        protected-ripple-color: var(--mat-sys-on-tertiary),
+      )
+    );
+  }
   @include mat.card-overrides(
     (
       elevated-container-shape: 8px,

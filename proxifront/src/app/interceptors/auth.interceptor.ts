@@ -22,7 +22,8 @@ export function resetAuthInterceptorState(): void {
 }
 
 function isAuthEndpoint(url: string): boolean {
-  return AUTH_ENDPOINTS.some((path) => url.includes(path));
+  const { pathname } = new URL(url, 'http://localhost');
+  return AUTH_ENDPOINTS.some((path) => pathname === path);
 }
 
 function withBearer<T>(req: HttpRequest<T>, token: string): HttpRequest<T> {

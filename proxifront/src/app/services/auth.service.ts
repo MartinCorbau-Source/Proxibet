@@ -71,14 +71,16 @@ export class AuthService {
   }
 
   getMe(): Observable<AuthenticatedUser> {
-    return this.http.get<AuthenticatedUser>(`${environment.apiUrl}/api/v1/me`);
+    return this.http
+      .get<AuthenticatedUser>(`${environment.apiUrl}/api/v1/me`)
+      .pipe(tap((user) => this.currentUserStore.set(user)));
   }
 
   private applySession(response: LoginResponse | RefreshResponse): void {
     this.tokenStorage.save({
       accessToken: response.access_token,
       refreshToken: response.refresh_token,
-      expiresAt: response.expires_in,
+      expiresAt: Date.now() + response.expires_in * 1000,
       user: response.user,
     });
     this.currentUserStore.set(response.user);
