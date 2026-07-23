@@ -102,6 +102,8 @@ func (generator *TokenGenerator) ParseAccessToken(tokenString string) (AccessTok
 	}
 
 	return claims, nil
+}
+
 func (generator *TokenGenerator) Validate(signedToken string) (uuid.UUID, error) {
 	signedToken = strings.TrimSpace(signedToken)
 	if signedToken == "" {

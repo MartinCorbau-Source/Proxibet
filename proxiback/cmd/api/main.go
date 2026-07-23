@@ -133,17 +133,7 @@ func main() {
 		authHandler.ChangePassword,
 	)
 
-	registerStaticFrontend(mux, logger)
-
-	allowedOrigins := []string{"http://localhost:6767"}
-	if corsAllowedOrigins := os.Getenv("CORS_ALLOWED_ORIGINS"); corsAllowedOrigins != "" {
-		allowedOrigins = strings.Split(corsAllowedOrigins, ",")
-	}
-
-	server := &http.Server{
-		Addr:    ":8080",
-		Handler: httpx.CORSMiddleware(allowedOrigins)(mux),
-	}
+	mux.HandleFunc(
 		"POST /api/v1/auth/refresh",
 		authHandler.Refresh,
 	)
@@ -158,11 +148,12 @@ func main() {
 		requireAuth(http.HandlerFunc(profileHandler.UpdateMe)),
 	)
 
+	registerStaticFrontend(mux, logger)
+
 	server := &http.Server{
 		Addr:    ":8080",
 		Handler: httpx.CORSMiddleware(corsAllowedOriginsFromEnv())(mux),
 	}
-
 	logger.Info("starting API", "port", 8080)
 
 	if err := server.ListenAndServe(); err != nil {
@@ -222,8 +213,6 @@ func registerStaticFrontend(mux *http.ServeMux, logger *slog.Logger) {
 	)
 }
 
-func jwtDurationFromEnv() time.Duration {
-	durationStr := os.Getenv("JWT_DURATION")
 func corsAllowedOriginsFromEnv() []string {
 	corsAllowedOrigins := os.Getenv("CORS_ALLOWED_ORIGINS")
 	if corsAllowedOrigins == "" {

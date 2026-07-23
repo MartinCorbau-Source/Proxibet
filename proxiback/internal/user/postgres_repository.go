@@ -275,6 +275,8 @@ func (repository *PostgresRepository) ResetPasswordWithToken(
 	}
 
 	return nil
+}
+
 func (repository *PostgresRepository) UpdateProfile(
 	ctx context.Context,
 	id uuid.UUID,

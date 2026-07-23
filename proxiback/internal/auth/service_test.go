@@ -12,13 +12,17 @@ import (
 	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/user"
 )
 
+func newTestService(repository user.Repository, tokenGenerator *TokenGenerator) *Service {
+	return NewService(repository, nil, tokenGenerator, time.Hour)
+}
+
 func TestChangePasswordUpdatesPasswordHash(t *testing.T) {
 	t.Parallel()
 
 	storedUser := testUser(t, "current-password")
 	repository := &fakeUserRepository{storedUser: storedUser}
 	tokenGenerator := testTokenGenerator(t)
-	service := NewService(repository, tokenGenerator)
+	service := newTestService(repository, tokenGenerator)
 	accessToken := testAccessToken(t, tokenGenerator, storedUser)
 
 	err := service.ChangePassword(context.Background(), accessToken, "current-password", "new-password")
@@ -49,7 +53,7 @@ func TestChangePasswordRejectsInvalidCurrentPassword(t *testing.T) {
 	storedUser := testUser(t, "current-password")
 	repository := &fakeUserRepository{storedUser: storedUser}
 	tokenGenerator := testTokenGenerator(t)
-	service := NewService(repository, tokenGenerator)
+	service := newTestService(repository, tokenGenerator)
 	accessToken := testAccessToken(t, tokenGenerator, storedUser)
 
 	err := service.ChangePassword(context.Background(), accessToken, "wrong-password", "new-password")
@@ -68,7 +72,7 @@ func TestChangePasswordRejectsInvalidNewPassword(t *testing.T) {
 	storedUser := testUser(t, "current-password")
 	repository := &fakeUserRepository{storedUser: storedUser}
 	tokenGenerator := testTokenGenerator(t)
-	service := NewService(repository, tokenGenerator)
+	service := newTestService(repository, tokenGenerator)
 	accessToken := testAccessToken(t, tokenGenerator, storedUser)
 
 	err := service.ChangePassword(context.Background(), accessToken, "current-password", "short")
@@ -86,7 +90,7 @@ func TestChangePasswordRejectsInvalidToken(t *testing.T) {
 
 	repository := &fakeUserRepository{storedUser: testUser(t, "current-password")}
 	tokenGenerator := testTokenGenerator(t)
-	service := NewService(repository, tokenGenerator)
+	service := newTestService(repository, tokenGenerator)
 
 	err := service.ChangePassword(context.Background(), "not-a-token", "current-password", "new-password")
 	if !errors.Is(err, user.ErrInvalidToken) {
@@ -103,7 +107,7 @@ func TestRequestPasswordResetCreatesHashedToken(t *testing.T) {
 
 	storedUser := testUser(t, "current-password")
 	repository := &fakeUserRepository{storedUser: storedUser}
-	service := NewService(repository, testTokenGenerator(t))
+	service := newTestService(repository, testTokenGenerator(t))
 
 	ticket, err := service.RequestPasswordReset(context.Background(), " MARTIN@EXAMPLE.COM ")
 	if err != nil {
@@ -144,7 +148,7 @@ func TestRequestPasswordResetDoesNotRevealUnknownEmail(t *testing.T) {
 	t.Parallel()
 
 	repository := &fakeUserRepository{storedUser: testUser(t, "current-password")}
-	service := NewService(repository, testTokenGenerator(t))
+	service := newTestService(repository, testTokenGenerator(t))
 
 	ticket, err := service.RequestPasswordReset(context.Background(), "unknown@example.com")
 	if err != nil {
@@ -166,7 +170,7 @@ func TestRequestPasswordResetDoesNotCreateTokenForInactiveUser(t *testing.T) {
 	storedUser := testUser(t, "current-password")
 	storedUser.Status = user.StatusInactive
 	repository := &fakeUserRepository{storedUser: storedUser}
-	service := NewService(repository, testTokenGenerator(t))
+	service := newTestService(repository, testTokenGenerator(t))
 
 	ticket, err := service.RequestPasswordReset(context.Background(), storedUser.Email)
 	if err != nil {
@@ -186,7 +190,7 @@ func TestResetPasswordUsesTokenHashAndUpdatesPassword(t *testing.T) {
 	t.Parallel()
 
 	repository := &fakeUserRepository{storedUser: testUser(t, "current-password")}
-	service := NewService(repository, testTokenGenerator(t))
+	service := newTestService(repository, testTokenGenerator(t))
 
 	err := service.ResetPassword(context.Background(), "reset-token", "new-password")
 	if err != nil {
@@ -218,7 +222,7 @@ func TestResetPasswordRejectsMissingToken(t *testing.T) {
 	t.Parallel()
 
 	repository := &fakeUserRepository{storedUser: testUser(t, "current-password")}
-	service := NewService(repository, testTokenGenerator(t))
+	service := newTestService(repository, testTokenGenerator(t))
 
 	err := service.ResetPassword(context.Background(), "   ", "new-password")
 	if !errors.Is(err, user.ErrInvalidPasswordResetToken) {
@@ -234,7 +238,7 @@ func TestResetPasswordRejectsInvalidNewPassword(t *testing.T) {
 	t.Parallel()
 
 	repository := &fakeUserRepository{storedUser: testUser(t, "current-password")}
-	service := NewService(repository, testTokenGenerator(t))
+	service := newTestService(repository, testTokenGenerator(t))
 
 	err := service.ResetPassword(context.Background(), "reset-token", "short")
 	if !errors.Is(err, ErrPasswordTooShort) {
@@ -305,6 +309,10 @@ func (repository *fakeUserRepository) ResetPasswordWithToken(ctx context.Context
 	repository.resetPasswordNow = now
 
 	return nil
+}
+
+func (repository *fakeUserRepository) UpdateProfile(ctx context.Context, id uuid.UUID, update user.UpdateProfile) (user.User, error) {
+	return repository.storedUser, nil
 }
 
 func testUser(t *testing.T, password string) user.User {
