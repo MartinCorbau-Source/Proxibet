@@ -5,6 +5,8 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"path"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -117,6 +119,31 @@ func main() {
 	)
 
 	mux.HandleFunc(
+		"POST /api/v1/auth/forgot-password",
+		authHandler.ForgotPassword,
+	)
+
+	mux.HandleFunc(
+		"POST /api/v1/auth/reset-password",
+		authHandler.ResetPassword,
+	)
+
+	mux.HandleFunc(
+		"PATCH /api/v1/auth/password",
+		authHandler.ChangePassword,
+	)
+
+	registerStaticFrontend(mux, logger)
+
+	allowedOrigins := []string{"http://localhost:6767"}
+	if corsAllowedOrigins := os.Getenv("CORS_ALLOWED_ORIGINS"); corsAllowedOrigins != "" {
+		allowedOrigins = strings.Split(corsAllowedOrigins, ",")
+	}
+
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: httpx.CORSMiddleware(allowedOrigins)(mux),
+	}
 		"POST /api/v1/auth/refresh",
 		authHandler.Refresh,
 	)
@@ -149,6 +176,54 @@ func main() {
 	}
 }
 
+func registerStaticFrontend(mux *http.ServeMux, logger *slog.Logger) {
+	staticDir := os.Getenv("STATIC_DIR")
+	if staticDir == "" {
+		return
+	}
+
+	indexPath := filepath.Join(staticDir, "index.html")
+	if _, err := os.Stat(indexPath); err != nil {
+		logger.Warn(
+			"frontend static files unavailable",
+			"dir",
+			staticDir,
+			"error",
+			err,
+		)
+
+		return
+	}
+
+	fileServer := http.FileServer(http.Dir(staticDir))
+	mux.HandleFunc(
+		"GET /",
+		func(
+			responseWriter http.ResponseWriter,
+			request *http.Request,
+		) {
+			cleanPath := strings.TrimPrefix(path.Clean("/"+request.URL.Path), "/")
+			filePath := filepath.Join(staticDir, filepath.FromSlash(cleanPath))
+
+			if fileInfo, err := os.Stat(filePath); err == nil && !fileInfo.IsDir() {
+				fileServer.ServeHTTP(responseWriter, request)
+
+				return
+			}
+
+			if path.Ext(cleanPath) != "" {
+				http.NotFound(responseWriter, request)
+
+				return
+			}
+
+			http.ServeFile(responseWriter, request, indexPath)
+		},
+	)
+}
+
+func jwtDurationFromEnv() time.Duration {
+	durationStr := os.Getenv("JWT_DURATION")
 func corsAllowedOriginsFromEnv() []string {
 	corsAllowedOrigins := os.Getenv("CORS_ALLOWED_ORIGINS")
 	if corsAllowedOrigins == "" {

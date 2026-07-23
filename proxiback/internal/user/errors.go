@@ -11,8 +11,9 @@ var (
 	ErrMissingPassword    = errors.New("password cannot be empty")
 	ErrInvalidDisplayName = errors.New("invalid display name")
 
-	ErrInvalidCredentials = errors.New("invalid credentials")
-	ErrAccountInactive    = errors.New("account is inactive")
-	ErrInvalidToken       = errors.New("invalid token")
-	ErrTokenExpired       = errors.New("token has expired")
+	ErrInvalidCredentials        = errors.New("invalid credentials")
+	ErrAccountInactive           = errors.New("account is inactive")
+	ErrInvalidToken              = errors.New("invalid token")
+	ErrInvalidPasswordResetToken = errors.New("invalid password reset token")
+	ErrTokenExpired              = errors.New("token has expired")
 )

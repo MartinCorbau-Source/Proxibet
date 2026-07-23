@@ -1,34 +1,34 @@
 # syntax=docker/dockerfile:1
 
-# -------------------------------------------------------
-# Étape 1 : compilation
-# -------------------------------------------------------
-FROM golang:1.26-alpine AS builder
+FROM node:24-alpine AS frontend-builder
 
-WORKDIR /app
+WORKDIR /src/proxifront
 
+COPY proxifront/package*.json ./
 
+RUN npm ci
 
+COPY proxifront/ ./
 
-# On copie d'abord uniquement les fichiers de dépendances
-# pour profiter du cache Docker.
-COPY go.mod go.sum ./
+RUN npm run build -- --output-path=/out/proxifront \
+    && test -f /out/proxifront/browser/index.html
+
+FROM golang:1.26-alpine AS backend-builder
+
+WORKDIR /src/proxiback
+
+COPY proxiback/go.mod proxiback/go.sum ./
 
 RUN go mod download
 
-# Puis on copie le reste du projet.
-COPY . .
+COPY proxiback/ ./
 
-# Construction d'un binaire Linux statique.
 RUN CGO_ENABLED=0 GOOS=linux go build \
     -trimpath \
     -ldflags="-s -w" \
-    -o /app/bin/proxibet-api \
+    -o /out/proxibet-api \
     ./cmd/api
 
-# -------------------------------------------------------
-# Étape 2 : image d'exécution
-# -------------------------------------------------------
 FROM alpine:3.22 AS runtime
 
 RUN apk add --no-cache ca-certificates \
@@ -37,7 +37,10 @@ RUN apk add --no-cache ca-certificates \
 
 WORKDIR /app
 
-COPY --from=builder /app/bin/proxibet-api /app/proxibet-api
+ENV STATIC_DIR=/app/public
+
+COPY --from=backend-builder /out/proxibet-api /app/proxibet-api
+COPY --from=frontend-builder /out/proxifront/browser /app/public
 
 USER proxibet
 
