@@ -18,3 +18,8 @@ docker compose up --build -d
 ```
 
 Les migrations SQL presentes dans `proxiback/migrations` sont appliquees automatiquement au demarrage de l'API.
+
+## Documentation fonctionnelle
+
+- [Epic 3 - Groupes de collegues](docs/epic-3-groupes.md)
+

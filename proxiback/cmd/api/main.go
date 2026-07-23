@@ -14,6 +14,7 @@ import (
 
 	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/auth"
 	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/database"
+	groups "github.com/MartinCorbau-Source/proxibet/proxiback/internal/group"
 	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/httpx"
 	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/profile"
 	"github.com/MartinCorbau-Source/proxibet/proxiback/internal/user"
@@ -83,6 +84,7 @@ func main() {
 
 	userRepository := user.NewPostgresRepository(pool)
 	refreshTokenRepository := auth.NewPostgresRefreshTokenRepository(pool)
+	groupRepository := groups.NewPostgresRepository(pool)
 
 	authService := auth.NewService(
 		userRepository,
@@ -91,8 +93,11 @@ func main() {
 		refreshTokenDurationFromEnv(),
 	)
 
+	groupService := groups.NewService(groupRepository)
+
 	authHandler := auth.NewHandler(authService, logger)
 	profileHandler := profile.NewHandler(userRepository, logger)
+	groupHandler := groups.NewHandler(groupService, logger)
 	requireAuth := auth.NewAuthenticationMiddleware(tokenGenerator)
 
 	mux := http.NewServeMux()
@@ -160,6 +165,55 @@ func main() {
 		requireAuth(http.HandlerFunc(profileHandler.UpdateMe)),
 	)
 
+	mux.Handle(
+		"POST /api/v1/groups",
+		requireAuth(http.HandlerFunc(groupHandler.CreateGroup)),
+	)
+
+	mux.Handle(
+		"GET /api/v1/groups",
+		requireAuth(http.HandlerFunc(groupHandler.ListGroups)),
+	)
+
+	mux.Handle(
+		"GET /api/v1/groups/{groupId}",
+		requireAuth(http.HandlerFunc(groupHandler.GetGroup)),
+	)
+
+	mux.Handle(
+		"DELETE /api/v1/groups/{groupId}",
+		requireAuth(http.HandlerFunc(groupHandler.DeleteGroup)),
+	)
+
+	mux.Handle(
+		"POST /api/v1/groups/{groupId}/invitations",
+		requireAuth(http.HandlerFunc(groupHandler.CreateInvitation)),
+	)
+
+	mux.Handle(
+		"PATCH /api/v1/groups/{groupId}/invitations/{invitationId}",
+		requireAuth(http.HandlerFunc(groupHandler.DeactivateInvitation)),
+	)
+
+	mux.Handle(
+		"POST /api/v1/groups/join",
+		requireAuth(http.HandlerFunc(groupHandler.JoinGroup)),
+	)
+
+	mux.Handle(
+		"GET /api/v1/groups/{groupId}/members",
+		requireAuth(http.HandlerFunc(groupHandler.ListMembers)),
+	)
+
+	mux.Handle(
+		"PATCH /api/v1/groups/{groupId}/members/{userId}",
+		requireAuth(http.HandlerFunc(groupHandler.UpdateMember)),
+	)
+
+	mux.Handle(
+		"DELETE /api/v1/groups/{groupId}/members/{userId}",
+		requireAuth(http.HandlerFunc(groupHandler.DeleteMember)),
+	)
 	registerStaticFrontend(mux, logger)
 
 	server := &http.Server{
