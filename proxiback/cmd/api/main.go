@@ -133,18 +133,6 @@ func main() {
 		authHandler.ChangePassword,
 	)
 
-	registerStaticFrontend(mux, logger)
-
-	allowedOrigins := []string{"http://localhost:6767"}
-	if corsAllowedOrigins := os.Getenv("CORS_ALLOWED_ORIGINS"); corsAllowedOrigins != "" {
-		allowedOrigins = strings.Split(corsAllowedOrigins, ",")
-	}
-
-	server := &http.Server{
-		Addr:    ":8080",
-		Handler: httpx.CORSMiddleware(allowedOrigins)(mux),
-	}
-
 	mux.HandleFunc(
 		"POST /api/v1/auth/refresh",
 		authHandler.Refresh,

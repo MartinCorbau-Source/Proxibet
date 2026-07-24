@@ -43,6 +43,54 @@ go.work.sum
 /proxifront/out-tsc
 /proxifront/bazel-out
 
+# ---> .NET / MAUI (ProxiBetApp)
+/ProxiBetApp/**/bin/
+/ProxiBetApp/**/obj/
+/ProxiBetApp/.vs/
+*.user
+*.userosscache
+*.suo
+
+# MAUI/Visual Studio local overrides
+*.userprefs
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Oo]bj/
+[Oo]ut/
+[Ll]og/
+[Ll]ogs/
+
+# .NET Core / NuGet
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*.nuget.props
+*.nuget.targets
+
+# Mobile Tools for Java (Xamarin/MAUI Android)
+.mono/
+Binaries/
+obj/
+
+# Xcode/iOS build artifacts (MAUI iOS/Mac Catalyst)
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Android build artifacts
+*.apk
+*.aab
+
 # System files
 .DS_Store
 Thumbs.db
