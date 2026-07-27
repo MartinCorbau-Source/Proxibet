@@ -1,0 +1,54 @@
+# CLAUDE.md — ProxiBetApp (.NET MAUI)
+
+Ce fichier documente le design system de l'app mobile MAUI (`ProxiBetApp/ProxiBetApp/`). Il complète le `CLAUDE.md` racine du monorepo, qui couvre `proxiback/` et `proxifront/`.
+
+## Principe d'acceptation du design system
+
+**Un redesign visuel (couleurs, rayons, espacements, typographie) doit pouvoir se faire en éditant uniquement `Resources/Styles/` et/ou `Components/` — jamais `Pages/*.xaml`.**
+
+Si un changement de design oblige à toucher une page, c'est le signe qu'un token ou un composant manque : il faut l'ajouter à la couche appropriée plutôt que de patcher la page.
+
+Avant tout changement de token, valider le rendu sur `Pages/Dev/ComponentGalleryPage.xaml` (route `dev/gallery`, disponible uniquement en build Debug) : elle instancie chaque composant/variante et sert de banc de test visuel, plus rapide que de naviguer Login → Register → Me.
+
+## Couche de tokens (`Resources/Styles/`)
+
+Fichiers mergés dans `App.xaml`, dans cet ordre (l'ordre compte : les styles implicites plus tardifs dans la liste peuvent s'appuyer sur les précédents) :
+
+1. `Colors.xaml` — échelles Primary/Secondary (10 niveaux, générées depuis un seed HSL), alias sémantiques (`Primary`, `Error`, `ErrorDark`...), tokens de fond Dark/Light, grayscale, brushes assortis.
+2. `Spacing.xaml` — échelle numérique `size20`-`size560`, `IconSize(Small)` (OnIdiom), `LayoutPadding`/`LayoutSpacing` (OnIdiom), `FormMaxWidth`, `FormSpacing`.
+3. `Typography.xaml` — style `Label` implicite + échelle keyée façon Fluent 2 (`Caption2/1/1Strong`, `Body2/2Strong/1/1Strong`, `Title3/2/1`, `LargeTitle`, `Display`).
+4. `Buttons.xaml` — `BaseButtonStyle` (keyé, base commune), style `Button` implicite (BasedOn), `SecondaryButtonStyle` (BasedOn, variante transparente/lien).
+5. `Inputs.xaml` — styles implicites `Entry`/`Editor`/`Picker`.
+6. `Cards.xaml` — style `Border` implicite + `CardStyle` (keyé).
+7. `Shell.xaml` — styles `Page`/`Shell`/`NavigationPage`/`TabbedPage`.
+8. `Controls.xaml` — styles implicites pour les contrôles natifs restants (ActivityIndicator, Switch, CheckBox...).
+
+**Règle dure** : toute couleur, taille, espacement ou rayon utilisé dans `Components/*.xaml` ou `Pages/*.xaml` doit référencer un `{StaticResource}` (éventuellement via `{AppThemeBinding}` pour le Dark/Light). Si la valeur nécessaire n'a pas encore de token, l'ajouter d'abord dans le fichier de tokens concerné (avec un commentaire expliquant sa provenance/son usage, voir `FormMaxWidth`/`FormSpacing` en exemple), puis le consommer — ne jamais coder une valeur en dur "en attendant".
+
+## Couche de composants (`Components/`)
+
+Composants composites réutilisables, au-dessus des styles implicites/keyés. Convention :
+
+- Chaque composant = un `ContentView` en XAML + code-behind, exactement comme les pages (`ComponentName.xaml` + `ComponentName.xaml.cs`, `x:Class="ProxiBetApp.Components.ComponentName"`). Pas de C# markup.
+- API publique = uniquement des `BindableProperty`. Une page consommatrice ne doit jamais overrider les enfants internes d'un composant depuis son propre XAML.
+- Variantes visuelles exposées via une propriété bindable (enum si plusieurs valeurs), qui sélectionne en interne un `Style` nommé — jamais via des setters ad hoc côté appelant. C'est le principe déjà appliqué par `SecondaryButtonStyle` (un seul point d'édition pour tous les appelants).
+- Composants "dumb"/présentationnels : pas de référence à un `PageModel`. Le binding avec la logique métier se fait uniquement via les `BindableProperty` exposées par le composant.
+- Rester à plat dans `Components/` tant qu'il y a moins de ~8-10 fichiers ; sous-dossiers (`Components/Forms/`, `Components/Layout/`...) seulement quand une catégorie en justifie 3+.
+
+Composants existants :
+- `ValidationMessage` — message d'erreur utilisant les tokens `Error`/`ErrorDark`, se masque automatiquement quand `Text` est vide.
+- `FormField` — `Label` + `Entry` + `ValidationMessage`, propriétés bindables `FieldLabel`, `Text` (TwoWay), `Placeholder`, `Keyboard`, `IsPassword`, `ErrorMessage`.
+- `CenteredFormLayout` — shell `ScrollView > VerticalStackLayout` centré/largeur max pour les pages de formulaire ; accepte plusieurs enfants directs en XAML via `ContentProperty` (MAUI n'a pas de `ContentPresenter` hors `ControlTemplate`, d'où ce pattern par collection observable, voir le code-behind).
+
+`CardStyle` reste volontairement un style `Border` (pas de `ContentView` dédié) tant qu'aucun usage n'a besoin de comportement (tap, overlay de chargement...) — à revisiter le jour où ce besoin apparaît, pas avant.
+
+## Conventions de nommage
+
+- PascalCase, pas de préfixe `Custom`/`My`.
+- Paire de fichiers systématique `Nom.xaml` + `Nom.xaml.cs`.
+- Commentaires de rationale en français dans le XAML (styles et composants), comme déjà pratiqué dans `Colors.xaml`/`Buttons.xaml`/`Spacing.xaml` — expliquer le *pourquoi* (quelle duplication ça remplace, quelle contrainte ça respecte), pas le *quoi*.
+- `BindableProperty` : convention MAUI standard (`NomProperty` statique + accesseur `Nom`), pas de déviation.
+
+## Migration en cours
+
+Les pages `Pages/LoginPage.xaml`, `Pages/RegisterPage.xaml` et `Pages/MePage.xaml` consomment déjà `ValidationMessage`/`FormField`/`CenteredFormLayout` (Login/Register) ou `ValidationMessage` seul (Me, qui garde son `VerticalStackLayout` natif à cause du binding `EventToCommandBehavior` sur `x:Reference MeRoot`). Toute nouvelle page de formulaire doit utiliser `CenteredFormLayout` + `FormField` dès sa création plutôt que de dupliquer le pattern `ScrollView > VerticalStackLayout` à la main.

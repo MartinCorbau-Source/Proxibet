@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- Style Border implicite unique (fusion de l'ancien Styles.xaml + AppStyles.xaml -->
+    <!-- variante retenue : AppStyles.xaml, RoundRectangle 20 sans stroke) -->
+    <Style TargetType="Border">
+        <Setter Property="StrokeShape" Value="RoundRectangle 20"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="Padding" Value="{OnIdiom 15, Desktop=20}"/>
+    </Style>
+
+    <Style TargetType="Border" x:Key="CardStyle">
+        <Setter Property="StrokeShape" Value="RoundRectangle 20"/>
+        <Setter Property="Background" Value="{AppThemeBinding Light={StaticResource LightSecondaryBackground},Dark={StaticResource DarkSecondaryBackground}}"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="Padding" Value="{OnIdiom 15, Desktop=20}"/>
+    </Style>
+
+</ResourceDictionary>

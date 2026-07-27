@@ -1,7 +1,5 @@
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
-using ProxiBetApp.Services.Auth;
-using ProxiBetApp.Utilities;
 using Font = Microsoft.Maui.Font;
 
 namespace ProxiBetApp
@@ -19,6 +17,9 @@ namespace ProxiBetApp
         {
             Routing.RegisterRoute("register", typeof(RegisterPage));
             Routing.RegisterRoute("me", typeof(MePage));
+#if DEBUG
+            Routing.RegisterRoute("dev/gallery", typeof(Pages.Dev.ComponentGalleryPage));
+#endif
         }
 
         private async Task CheckInitialRouteAsync(IAuthService authService)
