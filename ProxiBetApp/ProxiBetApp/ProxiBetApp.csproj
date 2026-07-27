@@ -67,12 +67,20 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.8" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.10" />
+		<PackageReference Include="Refit" Version="14.0.1" />
+		<PackageReference Include="Refit.HttpClientFactory" Version="14.0.1" />
+		<PackageReference Include="Refit.Reflection" Version="14.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="12.3.0" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='Debug'">
+		<!-- Overlay visuel colorant les bounds de chaque View, utile pour diagnostiquer les soucis de layout. -->
+		<PackageReference Include="Plugin.Maui.DebugRainbows" Version="1.2.2" />
 	</ItemGroup>
 	
 </Project>

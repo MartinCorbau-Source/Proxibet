@@ -2,6 +2,7 @@ using System.Net;
 using Moq;
 using ProxiBetApp.Models.Auth;
 using ProxiBetApp.Services.Auth;
+using Refit;
 using Xunit;
 
 namespace ProxiBetApp.Tests
@@ -21,6 +22,7 @@ namespace ProxiBetApp.Tests
                 """;
             var handler = FakeHttpMessageHandler.ReturningJson(HttpStatusCode.OK, loginResponseJson);
             var httpClient = new HttpClient(handler) { BaseAddress = new Uri("http://localhost:8080") };
+            var authApi = RestService.For<IAuthApi>(httpClient);
 
             var tokenStorageMock = new Mock<ITokenStorage>();
             StoredSession? savedSession = null;
@@ -30,7 +32,7 @@ namespace ProxiBetApp.Tests
                 .Returns(Task.CompletedTask);
 
             var currentUserStore = new CurrentUserStore();
-            var sut = new AuthService(httpClient, tokenStorageMock.Object, currentUserStore);
+            var sut = new AuthService(authApi, tokenStorageMock.Object, currentUserStore);
 
             await sut.LoginAsync("alice@example.com", "password");
 
@@ -46,7 +48,8 @@ namespace ProxiBetApp.Tests
             var errorJson = """{ "error": "INVALID_CREDENTIALS", "message": "Email ou mot de passe invalide." }""";
             var handler = FakeHttpMessageHandler.ReturningJson(HttpStatusCode.Unauthorized, errorJson);
             var httpClient = new HttpClient(handler) { BaseAddress = new Uri("http://localhost:8080") };
-            var sut = new AuthService(httpClient, Mock.Of<ITokenStorage>(), new CurrentUserStore());
+            var authApi = RestService.For<IAuthApi>(httpClient);
+            var sut = new AuthService(authApi, Mock.Of<ITokenStorage>(), new CurrentUserStore());
 
             var ex = await Assert.ThrowsAsync<AuthApiException>(() => sut.LoginAsync("alice@example.com", "wrong"));
 
@@ -62,7 +65,8 @@ namespace ProxiBetApp.Tests
                 Content = new StringContent("not json"),
             });
             var httpClient = new HttpClient(handler) { BaseAddress = new Uri("http://localhost:8080") };
-            var sut = new AuthService(httpClient, Mock.Of<ITokenStorage>(), new CurrentUserStore());
+            var authApi = RestService.For<IAuthApi>(httpClient);
+            var sut = new AuthService(authApi, Mock.Of<ITokenStorage>(), new CurrentUserStore());
 
             var ex = await Assert.ThrowsAsync<AuthApiException>(() => sut.LoginAsync("alice@example.com", "password"));
 

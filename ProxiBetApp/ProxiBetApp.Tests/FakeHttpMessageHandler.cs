@@ -24,7 +24,9 @@ namespace ProxiBetApp.Tests
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             Requests.Add(request);
-            return Task.FromResult(_responder(request));
+            var response = _responder(request);
+            response.RequestMessage ??= request;
+            return Task.FromResult(response);
         }
     }
 }

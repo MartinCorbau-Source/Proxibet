@@ -4,6 +4,10 @@ using ProxiBetApp.Pages;
 using ProxiBetApp.PageModels;
 using ProxiBetApp.Services;
 using ProxiBetApp.Services.Auth;
+using Refit;
+#if DEBUG
+using Plugin.Maui.DebugRainbows;
+#endif
 
 namespace ProxiBetApp
 {
@@ -26,6 +30,7 @@ namespace ProxiBetApp
 #if DEBUG
             builder.Logging.AddDebug();
             builder.Services.AddLogging(configure => configure.AddDebug());
+            // builder.UseDebugRainbows(); // désactivé temporairement pour voir le vrai rendu visuel
 #endif
 
             builder.Services.AddSingleton<IErrorHandler, ModalErrorHandler>();
@@ -38,11 +43,11 @@ namespace ProxiBetApp
                 client.BaseAddress = new Uri(ApiConfig.BaseUrl);
             });
 
-            builder.Services.AddHttpClient<IAuthService, AuthService>(client =>
-            {
-                client.BaseAddress = new Uri(ApiConfig.BaseUrl);
-            })
-            .AddHttpMessageHandler<AuthHeaderHandler>();
+            builder.Services.AddRefitClient<IAuthApi>()
+                .ConfigureHttpClient(client => client.BaseAddress = new Uri(ApiConfig.BaseUrl))
+                .AddHttpMessageHandler<AuthHeaderHandler>();
+
+            builder.Services.AddTransient<IAuthService, AuthService>();
 
             builder.Services.AddTransient<LoginPageModel>();
             builder.Services.AddTransient<RegisterPageModel>();

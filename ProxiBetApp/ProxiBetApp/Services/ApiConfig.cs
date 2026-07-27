@@ -1,4 +1,4 @@
-namespace ProxiBetApp.Services.Auth
+namespace ProxiBetApp.Services
 {
     public static class ApiConfig
     {

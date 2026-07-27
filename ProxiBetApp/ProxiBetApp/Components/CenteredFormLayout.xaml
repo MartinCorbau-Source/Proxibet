@@ -5,17 +5,18 @@ l'identique dans Login/Register/Me. ContentPresenter n'existe qu'en ControlTempl
 la projection du contenu de la page hôte se fait donc via le code-behind (voir .xaml.cs),
 qui reparente les enfants déclarés par la page dans InnerLayout.
 -->
-<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ProxiBetApp.Components.CenteredFormLayout">
 
-    <ScrollView>
-        <VerticalStackLayout x:Name="InnerLayout"
-                              Padding="{StaticResource LayoutPadding}"
-                              Spacing="{StaticResource FormSpacing}"
-                              MaximumWidthRequest="{StaticResource FormMaxWidth}"
-                              HorizontalOptions="Center"
-                              VerticalOptions="Center" />
-    </ScrollView>
+    <ContentView.Content>
+        <ScrollView>
+            <VerticalStackLayout x:Name="InnerLayout"
+                                  Padding="{StaticResource LayoutPadding}"
+                                  Spacing="{StaticResource FormSpacing}"
+                                  MaximumWidthRequest="{StaticResource FormMaxWidth}"
+                                  HorizontalOptions="Center" />
+        </ScrollView>
+    </ContentView.Content>
 
 </ContentView>

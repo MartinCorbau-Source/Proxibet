@@ -49,6 +49,24 @@ Composants existants :
 - Commentaires de rationale en français dans le XAML (styles et composants), comme déjà pratiqué dans `Colors.xaml`/`Buttons.xaml`/`Spacing.xaml` — expliquer le *pourquoi* (quelle duplication ça remplace, quelle contrainte ça respecte), pas le *quoi*.
 - `BindableProperty` : convention MAUI standard (`NomProperty` statique + accesseur `Nom`), pas de déviation.
 
+## Couche de services (`Services/`)
+
+Organisation feature-first : un domaine métier = un sous-dossier de `Services/` (ex. `Services/Auth/`), en miroir avec son équivalent `Models/<Domaine>/` (ex. `Models/Auth/`). À l'intérieur d'un domaine, tous les fichiers (interfaces, implémentations, exceptions, handlers, utilitaires) restent à plat — même règle de seuil que `Components/` (rester à plat tant qu'il y a moins de ~8-10 fichiers ; sous-dossiers par rôle technique, ex. `Auth/Network/`, `Auth/Session/`, seulement quand une catégorie en justifie 3+ **et** que le dossier dépasse ce seuil).
+
+Les fichiers transverses à toute l'app (config partagée par plusieurs domaines comme `ApiConfig`, gestion d'erreur globale comme `IErrorHandler`/`ModalErrorHandler`) restent à la racine de `Services/`, jamais dans un sous-dossier de domaine — même si un seul domaine les consomme aujourd'hui, ils sont conceptuellement partagés.
+
+**Pas de vertical slice** (`Features/<Domaine>/{PageModels,Services,Models}`) : les couches horizontales `Pages/` → `PageModels/` → `Services/`/`Models/` restent la structure de référence. Un vertical slice casserait cette frontière pour un bénéfice nul tant qu'un seul domaine métier a une taille significative — à reconsidérer seulement si plusieurs domaines deviennent chacun assez gros pour avoir leurs propres `PageModels`/`Models`/`Services` nombreux, pas préventivement.
+
+## Convention xmlns
+
+Tous les fichiers XAML (`Components/*.xaml`, `Pages/*.xaml`, `App.xaml`) utilisent le xmlns global .NET MAUI 10 `http://schemas.microsoft.com/dotnet/maui/global` comme xmlns par défaut, au lieu de l'ancien `http://schemas.microsoft.com/dotnet/2021/maui` + préfixes `xmlns:components`/`xmlns:pageModels` par fichier. `ProxiBetApp.Components` et `ProxiBetApp.PageModels` sont agrégés dans ce schema via `GlobalXmlns.cs` (à la racine du projet, pendant de `GlobalUsings.cs` mais pour les xmlns XAML plutôt que les `using` C#) ; `ProxiBetApp` et `ProxiBetApp.Pages` y sont déjà inclus par défaut. Conséquence : dans le XAML, `FormField`, `CenteredFormLayout`, `ValidationMessage`, `LoginPageModel`, etc. se référencent sans préfixe (`<FormField .../>`, `x:DataType="LoginPageModel"`).
+
+`xmlns:x` reste déclaré partout (requis pour `x:Class`/`x:Name`/`x:DataType`). Les xmlns de packages tiers non couverts par le schema global (ex. `xmlns:toolkit` pour CommunityToolkit.Maui sur `MePage.xaml`) restent déclarés explicitement avec leur préfixe.
+
+Un nouveau namespace projet référencé depuis le XAML doit être ajouté à `GlobalXmlns.cs`, pas déclaré en xmlns local dans le fichier consommateur.
+
+**Choix délibéré** : `EnablePreviewFeatures`/`MauiAllowImplicitXmlnsDeclaration` (qui permettrait d'omettre aussi `xmlns`/`xmlns:x` racine) n'est pas activé — c'est une feature preview, le gain marginal ne justifie pas le risque de stabilité sur un projet qui n'est pas encore en prod.
+
 ## Migration en cours
 
 Les pages `Pages/LoginPage.xaml`, `Pages/RegisterPage.xaml` et `Pages/MePage.xaml` consomment déjà `ValidationMessage`/`FormField`/`CenteredFormLayout` (Login/Register) ou `ValidationMessage` seul (Me, qui garde son `VerticalStackLayout` natif à cause du binding `EventToCommandBehavior` sur `x:Reference MeRoot`). Toute nouvelle page de formulaire doit utiliser `CenteredFormLayout` + `FormField` dès sa création plutôt que de dupliquer le pattern `ScrollView > VerticalStackLayout` à la main.

@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:pageModels="clr-namespace:ProxiBetApp.PageModels"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             xmlns:components="clr-namespace:ProxiBetApp.Components"
              x:Class="ProxiBetApp.Pages.MePage"
              x:Name="MeRoot"
-             x:DataType="pageModels:MePageModel"
+             x:DataType="MePageModel"
              Title="Mon profil">
 
     <ContentPage.Behaviors>
@@ -22,7 +20,7 @@
 
         <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
 
-        <components:ValidationMessage Text="{Binding ErrorMessage}" />
+        <ValidationMessage Text="{Binding ErrorMessage}" />
 
         <Border Style="{StaticResource CardStyle}">
             <VerticalStackLayout Spacing="8">

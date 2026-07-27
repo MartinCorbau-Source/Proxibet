@@ -1,46 +1,52 @@
-using System.Net.Http.Json;
+using Refit;
 
 namespace ProxiBetApp.Services.Auth
 {
     public sealed class AuthService : IAuthService
     {
-        private readonly HttpClient _httpClient;
+        private readonly IAuthApi _authApi;
         private readonly ITokenStorage _tokenStorage;
         private readonly CurrentUserStore _currentUserStore;
 
-        public AuthService(HttpClient httpClient, ITokenStorage tokenStorage, CurrentUserStore currentUserStore)
+        public AuthService(IAuthApi authApi, ITokenStorage tokenStorage, CurrentUserStore currentUserStore)
         {
-            _httpClient = httpClient;
+            _authApi = authApi;
             _tokenStorage = tokenStorage;
             _currentUserStore = currentUserStore;
         }
 
         public async Task<AuthenticatedUser> RegisterAsync(string displayName, string email, string password)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/v1/auth/register", new RegisterRequest
+            try
             {
-                DisplayName = displayName,
-                Email = email,
-                Password = password,
-            });
-
-            await EnsureSuccessAsync(response);
-            var body = await response.Content.ReadFromJsonAsync<AuthenticatedUser>();
-            return body ?? throw new AuthApiException("INTERNAL_ERROR", "Une erreur inattendue est survenue. Veuillez réessayer.");
+                return await _authApi.RegisterAsync(new RegisterRequest
+                {
+                    DisplayName = displayName,
+                    Email = email,
+                    Password = password,
+                });
+            }
+            catch (ApiException ex)
+            {
+                throw await AuthApiException.FromRefitExceptionAsync(ex);
+            }
         }
 
         public async Task LoginAsync(string email, string password)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest
+            LoginResponse body;
+            try
             {
-                Email = email,
-                Password = password,
-            });
-
-            await EnsureSuccessAsync(response);
-            var body = await response.Content.ReadFromJsonAsync<LoginResponse>();
-            if (body is null)
-                throw new AuthApiException("INTERNAL_ERROR", "Une erreur inattendue est survenue. Veuillez réessayer.");
+                body = await _authApi.LoginAsync(new LoginRequest
+                {
+                    Email = email,
+                    Password = password,
+                });
+            }
+            catch (ApiException ex)
+            {
+                throw await AuthApiException.FromRefitExceptionAsync(ex);
+            }
 
             await ApplySessionAsync(body);
         }
@@ -53,11 +59,15 @@ namespace ProxiBetApp.Services.Auth
 
         public async Task<AuthenticatedUser> GetMeAsync()
         {
-            var response = await _httpClient.GetAsync("/api/v1/me");
-            await EnsureSuccessAsync(response);
-            var body = await response.Content.ReadFromJsonAsync<AuthenticatedUser>();
-            if (body is null)
-                throw new AuthApiException("INTERNAL_ERROR", "Une erreur inattendue est survenue. Veuillez réessayer.");
+            AuthenticatedUser body;
+            try
+            {
+                body = await _authApi.GetMeAsync();
+            }
+            catch (ApiException ex)
+            {
+                throw await AuthApiException.FromRefitExceptionAsync(ex);
+            }
 
             _currentUserStore.CurrentUser = body;
             return body;
@@ -65,16 +75,19 @@ namespace ProxiBetApp.Services.Auth
 
         public async Task<AuthenticatedUser> UpdateMeAsync(string? displayName, string? email)
         {
-            var response = await _httpClient.PatchAsJsonAsync("/api/v1/me", new UpdateMeRequest
+            AuthenticatedUser body;
+            try
             {
-                DisplayName = displayName,
-                Email = email,
-            });
-
-            await EnsureSuccessAsync(response);
-            var body = await response.Content.ReadFromJsonAsync<AuthenticatedUser>();
-            if (body is null)
-                throw new AuthApiException("INTERNAL_ERROR", "Une erreur inattendue est survenue. Veuillez réessayer.");
+                body = await _authApi.UpdateMeAsync(new UpdateMeRequest
+                {
+                    DisplayName = displayName,
+                    Email = email,
+                });
+            }
+            catch (ApiException ex)
+            {
+                throw await AuthApiException.FromRefitExceptionAsync(ex);
+            }
 
             _currentUserStore.CurrentUser = body;
             return body;
@@ -102,27 +115,6 @@ namespace ProxiBetApp.Services.Auth
             });
 
             _currentUserStore.CurrentUser = body.User;
-        }
-
-        private static async Task EnsureSuccessAsync(HttpResponseMessage response)
-        {
-            if (response.IsSuccessStatusCode)
-                return;
-
-            ApiErrorResponse? error;
-            try
-            {
-                error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
-            }
-            catch (Exception)
-            {
-                error = null;
-            }
-
-            if (error is not null && !string.IsNullOrEmpty(error.Message))
-                throw new AuthApiException(error.Error, error.Message);
-
-            throw new AuthApiException("INTERNAL_ERROR", "Une erreur inattendue est survenue. Veuillez réessayer.");
         }
     }
 }
