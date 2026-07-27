@@ -1,5 +1,6 @@
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
+using ProxiBetApp.Services.Theme;
 using Font = Microsoft.Maui.Font;
 
 namespace ProxiBetApp
@@ -25,7 +26,7 @@ namespace ProxiBetApp
         private async Task CheckInitialRouteAsync(IAuthService authService)
         {
             if (await authService.IsAuthenticatedAsync())
-                await this.GoToAsync("/me");
+                await this.GoToAsync("//home");
         }
 
         public static async Task DisplaySnackbarAsync(string message)

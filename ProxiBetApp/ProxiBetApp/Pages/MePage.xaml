@@ -5,6 +5,7 @@
              x:Class="ProxiBetApp.Pages.MePage"
              x:Name="MeRoot"
              x:DataType="MePageModel"
+             Shell.NavBarIsVisible="False"
              Title="Mon profil">
 
     <ContentPage.Behaviors>
@@ -14,25 +15,37 @@
             Command="{Binding AppearingCommand}" />
     </ContentPage.Behaviors>
 
-    <VerticalStackLayout Padding="{StaticResource LayoutPadding}" Spacing="{StaticResource FormSpacing}" MaximumWidthRequest="{StaticResource FormMaxWidth}" HorizontalOptions="Center" VerticalOptions="Center">
+    <Grid RowDefinitions="Auto,*,Auto">
 
-        <Label Style="{StaticResource Title1}" Text="Mon profil" HorizontalOptions="Center" />
+        <AppHeader Grid.Row="0"
+                   HeaderTitle="Mon profil"
+                   ShowProfileIcon="False"
+                   IsDarkMode="{Binding IsDarkMode}"
+                   ToggleThemeCommand="{Binding ToggleThemeCommand}" />
 
-        <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="{StaticResource LayoutPadding}" Spacing="{StaticResource FormSpacing}" MaximumWidthRequest="{StaticResource FormMaxWidth}" HorizontalOptions="Center" VerticalOptions="Center">
 
-        <ValidationMessage Text="{Binding ErrorMessage}" />
+                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
 
-        <Border Style="{StaticResource CardStyle}">
-            <VerticalStackLayout Spacing="8">
-                <Label Text="Nom d'affichage" Style="{StaticResource Caption1}" />
-                <Label Text="{Binding User.DisplayName}" Style="{StaticResource Body1Strong}" />
+                <ValidationMessage Text="{Binding ErrorMessage}" />
 
-                <Label Text="Email" Style="{StaticResource Caption1}" />
-                <Label Text="{Binding User.Email}" Style="{StaticResource Body1Strong}" />
+                <Border Style="{StaticResource CardStyle}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Nom d'affichage" Style="{StaticResource Caption1}" />
+                        <Label Text="{Binding User.DisplayName}" Style="{StaticResource Body1Strong}" />
+
+                        <Label Text="Email" Style="{StaticResource Caption1}" />
+                        <Label Text="{Binding User.Email}" Style="{StaticResource Body1Strong}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Button Text="Se déconnecter" Command="{Binding LogoutCommand}" />
+
             </VerticalStackLayout>
-        </Border>
+        </ScrollView>
 
-        <Button Text="Se déconnecter" Command="{Binding LogoutCommand}" />
+        <BottomNavBar Grid.Row="2" GoToHomeCommand="{Binding GoToHomeCommand}" />
 
-    </VerticalStackLayout>
+    </Grid>
 </ContentPage>

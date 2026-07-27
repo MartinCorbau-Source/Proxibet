@@ -71,7 +71,7 @@ namespace ProxiBetApp.PageModels
             {
                 await _authService.LoginAsync(Email, Password);
                 await AppShell.DisplayToastAsync("Connexion réussie");
-                await Shell.Current.GoToAsync("/me");
+                await Shell.Current.GoToAsync("//home");
             }
             catch (AuthApiException ex)
             {

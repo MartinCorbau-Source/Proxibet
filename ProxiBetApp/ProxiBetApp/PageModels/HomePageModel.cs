@@ -5,13 +5,11 @@ using ProxiBetApp.Services.Theme;
 
 namespace ProxiBetApp.PageModels
 {
-    public partial class MePageModel : ObservableObject
+    public partial class HomePageModel : ObservableObject
     {
         private readonly IAuthService _authService;
         private readonly IThemeService _themeService;
-
-        [ObservableProperty]
-        private AuthenticatedUser? _user;
+        private readonly CurrentUserStore _currentUserStore;
 
         [ObservableProperty]
         private bool _isBusy;
@@ -22,17 +20,20 @@ namespace ProxiBetApp.PageModels
         [ObservableProperty]
         private bool _isDarkMode;
 
-        public MePageModel(IAuthService authService, IThemeService themeService)
+        public AuthenticatedUser? User => _currentUserStore.CurrentUser;
+
+        public HomePageModel(IAuthService authService, IThemeService themeService, CurrentUserStore currentUserStore)
         {
             _authService = authService;
             _themeService = themeService;
-            IsDarkMode = _themeService.CurrentTheme == AppTheme.Dark;
-        }
+            _currentUserStore = currentUserStore;
 
-        [RelayCommand]
-        private async Task ToggleThemeAsync()
-        {
-            await _themeService.ToggleThemeAsync();
+            _currentUserStore.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(Services.Auth.CurrentUserStore.CurrentUser))
+                    OnPropertyChanged(nameof(User));
+            };
+
             IsDarkMode = _themeService.CurrentTheme == AppTheme.Dark;
         }
 
@@ -44,7 +45,7 @@ namespace ProxiBetApp.PageModels
 
             try
             {
-                User = await _authService.GetMeAsync();
+                await _authService.GetMeAsync();
             }
             catch (AuthApiException)
             {
@@ -58,16 +59,22 @@ namespace ProxiBetApp.PageModels
         }
 
         [RelayCommand]
-        private async Task LogoutAsync()
+        private static async Task GoToProfileAsync()
         {
-            await _authService.LogoutAsync();
-            await Shell.Current.GoToAsync("//login");
+            await Shell.Current.GoToAsync("me");
         }
 
         [RelayCommand]
         private static async Task GoToHomeAsync()
         {
             await Shell.Current.GoToAsync("//home");
+        }
+
+        [RelayCommand]
+        private async Task ToggleThemeAsync()
+        {
+            await _themeService.ToggleThemeAsync();
+            IsDarkMode = _themeService.CurrentTheme == AppTheme.Dark;
         }
     }
 }

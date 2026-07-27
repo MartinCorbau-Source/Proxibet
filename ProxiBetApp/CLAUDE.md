@@ -39,6 +39,7 @@ Composants existants :
 - `ValidationMessage` — message d'erreur utilisant les tokens `Error`/`ErrorDark`, se masque automatiquement quand `Text` est vide.
 - `FormField` — `Label` + `Entry` + `ValidationMessage`, propriétés bindables `FieldLabel`, `Text` (TwoWay), `Placeholder`, `Keyboard`, `IsPassword`, `ErrorMessage`.
 - `CenteredFormLayout` — shell `ScrollView > VerticalStackLayout` centré/largeur max pour les pages de formulaire ; accepte plusieurs enfants directs en XAML via `ContentProperty` (MAUI n'a pas de `ContentPresenter` hors `ControlTemplate`, d'où ce pattern par collection observable, voir le code-behind).
+- `AppHeader` — en-tête des pages authentifiées : `Label` titre (style `Title2`) + bouton bascule thème (glyph FluentUI choisi via `Utilities.ThemeIconConverter` selon `IsDarkMode`) + bouton icône profil (glyph FluentUI `person_circle_24_regular`). Propriétés bindables `HeaderTitle` (string), `ProfileCommand` (`ICommand`), `ShowProfileIcon` (bool, défaut `true`, masque le bouton profil), `ToggleThemeCommand` (`ICommand`), `IsDarkMode` (bool). Embarqué en premier enfant du layout racine de chaque page authentifiée (`HomePage`, `MePage`) plutôt que via `Shell.TitleView`, qui est par-page/par-`ShellContent` et ne se partage pas automatiquement entre tabs Shell.
 
 `CardStyle` reste volontairement un style `Border` (pas de `ContentView` dédié) tant qu'aucun usage n'a besoin de comportement (tap, overlay de chargement...) — à revisiter le jour où ce besoin apparaît, pas avant.
 
@@ -69,4 +70,10 @@ Un nouveau namespace projet référencé depuis le XAML doit être ajouté à `G
 
 ## Migration en cours
 
-Les pages `Pages/LoginPage.xaml`, `Pages/RegisterPage.xaml` et `Pages/MePage.xaml` consomment déjà `ValidationMessage`/`FormField`/`CenteredFormLayout` (Login/Register) ou `ValidationMessage` seul (Me, qui garde son `VerticalStackLayout` natif à cause du binding `EventToCommandBehavior` sur `x:Reference MeRoot`). Toute nouvelle page de formulaire doit utiliser `CenteredFormLayout` + `FormField` dès sa création plutôt que de dupliquer le pattern `ScrollView > VerticalStackLayout` à la main.
+- `Pages/LoginPage.xaml` — migrée : `CenteredFormLayout` + `FormField` + `ValidationMessage`.
+- `Pages/RegisterPage.xaml` — migrée : `CenteredFormLayout` + `FormField` + `ValidationMessage`.
+- `Pages/HomePage.xaml` — partiellement migrée : `AppHeader` en en-tête + `ValidationMessage`, mais garde un `VerticalStackLayout`/`ScrollView` natif pour le corps (pas de composant de layout de type formulaire applicable ici, ce n'est pas un écran de saisie) ; le binding `EventToCommandBehavior` sur `x:Reference HomeRoot` (Appearing → `AppearingCommand`) impose aussi de garder `x:Name`/`x:Reference` sur la page.
+- `Pages/MePage.xaml` — partiellement migrée : `AppHeader` en en-tête (`ShowProfileIcon="False"`, déjà sur la page profil) + `ValidationMessage`, mais garde son `VerticalStackLayout` natif à cause du binding `EventToCommandBehavior` sur `x:Reference MeRoot`. N'est pas (encore) un `CardStyle`/`FormField` candidat pour la section infos utilisateur — à revisiter si un composant `InfoRow`/`ReadOnlyField` apparaît.
+- `Pages/Dev/ComponentGalleryPage.xaml` — hors périmètre de la règle (page de dev, jamais en Release), tenue à jour manuellement en miroir de `Components/`.
+
+Toute nouvelle page de formulaire doit utiliser `CenteredFormLayout` + `FormField` dès sa création plutôt que de dupliquer le pattern `ScrollView > VerticalStackLayout` à la main. Toute nouvelle page authentifiée (post-login) doit démarrer avec `AppHeader` en en-tête plutôt que de recréer un titre de page + icône profil/toggle de thème à la main.

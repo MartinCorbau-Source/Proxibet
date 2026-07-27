@@ -4,6 +4,7 @@ using ProxiBetApp.Pages;
 using ProxiBetApp.PageModels;
 using ProxiBetApp.Services;
 using ProxiBetApp.Services.Auth;
+using ProxiBetApp.Services.Theme;
 using Refit;
 #if DEBUG
 using Plugin.Maui.DebugRainbows;
@@ -36,6 +37,7 @@ namespace ProxiBetApp
             builder.Services.AddSingleton<IErrorHandler, ModalErrorHandler>();
             builder.Services.AddSingleton<ITokenStorage, TokenStorage>();
             builder.Services.AddSingleton<CurrentUserStore>();
+            builder.Services.AddSingleton<IThemeService, ThemeService>();
             builder.Services.AddTransient<AuthHeaderHandler>();
 
             builder.Services.AddHttpClient("proxibet-unauthenticated", client =>
@@ -52,10 +54,12 @@ namespace ProxiBetApp
             builder.Services.AddTransient<LoginPageModel>();
             builder.Services.AddTransient<RegisterPageModel>();
             builder.Services.AddTransient<MePageModel>();
+            builder.Services.AddTransient<HomePageModel>();
 
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<RegisterPage>();
             builder.Services.AddTransient<MePage>();
+            builder.Services.AddTransient<HomePage>();
 
             builder.Services.AddTransient<AppShell>();
 

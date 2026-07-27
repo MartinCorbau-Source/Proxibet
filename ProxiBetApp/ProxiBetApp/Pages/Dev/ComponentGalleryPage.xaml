@@ -8,12 +8,29 @@ dans Login/Register/Me.
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ProxiBetApp.Pages.Dev.ComponentGalleryPage"
+             xmlns:dev="clr-namespace:ProxiBetApp.Pages.Dev"
+             x:DataType="dev:ComponentGalleryPageModel"
              Title="Component Gallery">
 
     <ScrollView>
         <VerticalStackLayout Padding="{StaticResource LayoutPadding}" Spacing="{StaticResource size320}">
 
             <Label Style="{StaticResource Title1}" Text="Component Gallery" />
+
+            <!-- AppHeader -->
+            <Label Style="{StaticResource Title2}" Text="AppHeader" />
+            <Border Style="{StaticResource CardStyle}">
+                <AppHeader HeaderTitle="Accueil"
+                           ProfileCommand="{Binding NoOpCommand}"
+                           IsDarkMode="{Binding IsDarkMode}"
+                           ToggleThemeCommand="{Binding ToggleThemeCommand}" />
+            </Border>
+
+            <!-- BottomNavBar -->
+            <Label Style="{StaticResource Title2}" Text="BottomNavBar" />
+            <Border Style="{StaticResource CardStyle}">
+                <BottomNavBar GoToHomeCommand="{Binding NoOpCommand}" />
+            </Border>
 
             <!-- Typography -->
             <Label Style="{StaticResource Title2}" Text="Typography" />
