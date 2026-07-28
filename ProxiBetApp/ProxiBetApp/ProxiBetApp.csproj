@@ -82,5 +82,13 @@
 		<!-- Overlay visuel colorant les bounds de chaque View, utile pour diagnostiquer les soucis de layout. -->
 		<PackageReference Include="Plugin.Maui.DebugRainbows" Version="1.2.2" />
 	</ItemGroup>
-	
+
+	<!-- Sur device Android physique, "localhost" (ApiConfig.BaseUrl) désigne le téléphone lui-même :
+	     il faut un "adb reverse tcp:8080 tcp:8080" pour que ça atteigne le backend Docker de la machine
+	     hôte. Ce mapping ne survit pas à un débranchement/rebranchement USB, donc on le relance à chaque
+	     déploiement au lieu de compter sur l'avoir fait manuellement (voir CLAUDE.md / plan de fix). -->
+	<Target Name="AdbReverseBackendPort" AfterTargets="Install" Condition="'$(TargetFramework)'=='net10.0-android' And '$(Configuration)'=='Debug'">
+		<Exec Command="&quot;$(AdbToolPath)\adb.exe&quot; reverse tcp:8080 tcp:8080" ContinueOnError="true" />
+	</Target>
+
 </Project>
