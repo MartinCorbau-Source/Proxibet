@@ -7,8 +7,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Proxibet ("Pari entre pro") is a monorepo with three projects:
 
 - **proxiback/** — Go 1.25 REST API (module `github.com/MartinCorbau-Source/proxibet/proxiback`).
-- **proxifront/** — Angular 22 standalone frontend (Angular Material, Vitest).
-- **ProxiBetApp/** — .NET MAUI 10 mobile app. See [ProxiBetApp/CLAUDE.md](ProxiBetApp/CLAUDE.md) for its design system (tokens under `Resources/Styles/`, reusable component layer under `Components/`).
+- **proxifront/** — Angular 22 standalone frontend (Angular Material, Vitest). **Not actively developed right now** — current focus is the mobile app. Do not explore or modify `proxifront/` unless the user explicitly asks about it.
+- **ProxiBetApp/** — .NET MAUI 10 mobile app, current focus of development. See [ProxiBetApp/CLAUDE.md](ProxiBetApp/CLAUDE.md) for its design system (tokens under `Resources/Styles/`, reusable component layer under `Components/`) and [ProxiBetApp/README.md](ProxiBetApp/README.md) for how to run it (Visual Studio, Windows or Android device).
 
 They are wired together via `docker-compose.yml` at the repo root (services `database` = Postgres 17, `api` = the Go backend built from `proxiback/Dockerfile`). The frontend is not part of docker-compose and is run separately with the Angular CLI. `ProxiBetApp/` is fully independent (no docker-compose wiring), run via Visual Studio / `dotnet build`.
 
