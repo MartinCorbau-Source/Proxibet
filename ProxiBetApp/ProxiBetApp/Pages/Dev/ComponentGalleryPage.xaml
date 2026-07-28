@@ -10,27 +10,17 @@ dans Login/Register/Me.
              x:Class="ProxiBetApp.Pages.Dev.ComponentGalleryPage"
              xmlns:dev="clr-namespace:ProxiBetApp.Pages.Dev"
              x:DataType="dev:ComponentGalleryPageModel"
+             Shell.NavBarIsVisible="False"
              Title="Component Gallery">
 
-    <ScrollView>
+    <AuthenticatedPageLayout HeaderTitle="Component Gallery"
+                             ProfileCommand="{Binding NoOpCommand}"
+                             IsDarkMode="{Binding IsDarkMode}"
+                             ToggleThemeCommand="{Binding ToggleThemeCommand}">
+
         <VerticalStackLayout Padding="{StaticResource LayoutPadding}" Spacing="{StaticResource size320}">
 
             <Label Style="{StaticResource Title1}" Text="Component Gallery" />
-
-            <!-- AppHeader -->
-            <Label Style="{StaticResource Title2}" Text="AppHeader" />
-            <Border Style="{StaticResource CardStyle}">
-                <AppHeader HeaderTitle="Accueil"
-                           ProfileCommand="{Binding NoOpCommand}"
-                           IsDarkMode="{Binding IsDarkMode}"
-                           ToggleThemeCommand="{Binding ToggleThemeCommand}" />
-            </Border>
-
-            <!-- BottomNavBar -->
-            <Label Style="{StaticResource Title2}" Text="BottomNavBar" />
-            <Border Style="{StaticResource CardStyle}">
-                <BottomNavBar GoToHomeCommand="{Binding NoOpCommand}" />
-            </Border>
 
             <!-- Typography -->
             <Label Style="{StaticResource Title2}" Text="Typography" />
@@ -53,7 +43,9 @@ dans Login/Register/Me.
 
             <!-- FormField -->
             <Label Style="{StaticResource Title2}" Text="FormField" />
+            <Label Style="{StaticResource Caption1}" Text="État repos (tap dans le champ ci-dessous pour voir l'état focus)" />
             <FormField FieldLabel="Email" Placeholder="vous@exemple.com" Keyboard="Email" />
+            <Label Style="{StaticResource Caption1}" Text="État erreur" />
             <FormField FieldLabel="Mot de passe" Placeholder="Mot de passe" IsPassword="True" ErrorMessage="Mot de passe trop court" />
 
             <!-- Card -->
@@ -76,5 +68,6 @@ dans Login/Register/Me.
             </Border>
 
         </VerticalStackLayout>
-    </ScrollView>
+
+    </AuthenticatedPageLayout>
 </ContentPage>

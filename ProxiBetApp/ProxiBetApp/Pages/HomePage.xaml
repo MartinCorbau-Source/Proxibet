@@ -15,28 +15,26 @@
             Command="{Binding AppearingCommand}" />
     </ContentPage.Behaviors>
 
-    <Grid RowDefinitions="Auto,*,Auto">
+    <AuthenticatedPageLayout HeaderTitle="Accueil"
+                             ProfileCommand="{Binding GoToProfileCommand}"
+                             IsDarkMode="{Binding IsDarkMode}"
+                             ToggleThemeCommand="{Binding ToggleThemeCommand}">
 
-        <AppHeader Grid.Row="0"
-                   HeaderTitle="Accueil"
-                   ProfileCommand="{Binding GoToProfileCommand}"
-                   IsDarkMode="{Binding IsDarkMode}"
-                   ToggleThemeCommand="{Binding ToggleThemeCommand}" />
+        <VerticalStackLayout Padding="{StaticResource LayoutPadding}" Spacing="{StaticResource FormSpacing}">
 
-        <ScrollView Grid.Row="1">
-            <VerticalStackLayout Padding="{StaticResource LayoutPadding}" Spacing="{StaticResource FormSpacing}">
+            <Label Style="{StaticResource Title1}"
+                   Text="{Binding User.DisplayName, StringFormat='Bienvenue, {0} !'}" />
 
-                <Label Style="{StaticResource Title1}"
-                       Text="{Binding User.DisplayName, StringFormat='Bienvenue, {0} !'}" />
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
 
-                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+            <ValidationMessage Text="{Binding ErrorMessage}" />
 
-                <ValidationMessage Text="{Binding ErrorMessage}" />
+            <Button Text="[Debug] Component Gallery"
+                    Command="{Binding GoToDevGalleryCommand}"
+                    Style="{StaticResource SecondaryButtonStyle}"
+                    IsVisible="{Binding IsDevGalleryButtonVisible}" />
 
-            </VerticalStackLayout>
-        </ScrollView>
+        </VerticalStackLayout>
 
-        <BottomNavBar Grid.Row="2" GoToHomeCommand="{Binding GoToHomeCommand}" />
-
-    </Grid>
+    </AuthenticatedPageLayout>
 </ContentPage>

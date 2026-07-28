@@ -7,7 +7,7 @@ using ProxiBetApp.Services.Auth;
 
 namespace ProxiBetApp.PageModels
 {
-    public partial class RegisterPageModel : ObservableValidator
+    public partial class RegisterPageModel : PageModelBase
     {
         private readonly IAuthService _authService;
 
@@ -28,12 +28,6 @@ namespace ProxiBetApp.PageModels
         [Required(ErrorMessage = "Le mot de passe est requis.")]
         [MinLength(8, ErrorMessage = "Le mot de passe doit contenir au moins 8 caractères.")]
         private string _password = string.Empty;
-
-        [ObservableProperty]
-        private bool _isBusy;
-
-        [ObservableProperty]
-        private string? _errorMessage;
 
         public string DisplayNameError => GetErrors(nameof(DisplayName)).FirstOrDefault()?.ErrorMessage ?? string.Empty;
 
@@ -67,23 +61,12 @@ namespace ProxiBetApp.PageModels
             if (HasErrors)
                 return;
 
-            IsBusy = true;
-            ErrorMessage = null;
-
-            try
+            await ExecuteWithErrorHandlingAsync(async () =>
             {
                 await _authService.RegisterAsync(DisplayName, Email, Password);
                 await AppShell.DisplayToastAsync("Compte créé");
                 await Shell.Current.GoToAsync("//login");
-            }
-            catch (AuthApiException ex)
-            {
-                ErrorMessage = ex.Message;
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            });
         }
 
         [RelayCommand]

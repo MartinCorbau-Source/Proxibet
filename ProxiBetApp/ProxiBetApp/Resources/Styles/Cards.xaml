@@ -4,18 +4,40 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
     <!-- Style Border implicite unique (fusion de l'ancien Styles.xaml + AppStyles.xaml -->
-    <!-- variante retenue : AppStyles.xaml, RoundRectangle 20 sans stroke) -->
+    <!-- variante retenue : AppStyles.xaml). Radius aligné sur le shape system (Shapes.xaml) -->
+    <!-- au lieu de la valeur 20 dupliquée en dur. -->
     <Style TargetType="Border">
-        <Setter Property="StrokeShape" Value="RoundRectangle 20"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="{StaticResource CornerRadiusLarge}"/>
+            </Setter.Value>
+        </Setter>
         <Setter Property="StrokeThickness" Value="0"/>
         <Setter Property="Padding" Value="{OnIdiom 15, Desktop=20}"/>
     </Style>
 
+    <!--
+    CardStyle : élévation ajoutée (Shadow instancié inline, voir la note de Shapes.xaml sur
+    le partage d'instance Shadow). Niveau Elevation1 : une card reste une surface "au repos",
+    pas un élément flottant (réservé à des composants futurs type FAB/menu).
+    -->
     <Style TargetType="Border" x:Key="CardStyle">
-        <Setter Property="StrokeShape" Value="RoundRectangle 20"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="{StaticResource CornerRadiusLarge}"/>
+            </Setter.Value>
+        </Setter>
         <Setter Property="Background" Value="{AppThemeBinding Light={StaticResource LightSecondaryBackground},Dark={StaticResource DarkSecondaryBackground}}"/>
         <Setter Property="StrokeThickness" Value="0"/>
         <Setter Property="Padding" Value="{OnIdiom 15, Desktop=20}"/>
+        <Setter Property="Shadow">
+            <Setter.Value>
+                <Shadow Brush="{AppThemeBinding Light={StaticResource ShadowColor}, Dark={StaticResource ShadowColorDark}}"
+                        Radius="{StaticResource Elevation1Radius}"
+                        Opacity="{StaticResource Elevation1Opacity}"
+                        Offset="0,2" />
+            </Setter.Value>
+        </Setter>
     </Style>
 
 </ResourceDictionary>

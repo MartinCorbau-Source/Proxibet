@@ -57,6 +57,22 @@
     <Color x:Key="LightSecondaryBackground">#E0E0E0</Color>
     <Color x:Key="DarkSecondaryBackground">#222228</Color>
 
+    <!--
+    Outline/OutlineVariant : tokens Material 3 pour le contour des champs de formulaire
+    (état repos vs focus). Dérivés du grayscale existant plutôt que de nouvelles teintes,
+    pour rester cohérent avec la palette déjà en place. Voir FormField pour l'usage
+    (Border.Stroke qui bascule sur Primary au focus, Error en cas de validation KO).
+    -->
+    <Color x:Key="Outline">#919191</Color>
+    <Color x:Key="OutlineVariant">#C8C8C8</Color>
+    <Color x:Key="OutlineDark">#6E6E6E</Color>
+    <Color x:Key="OutlineVariantDark">#404040</Color>
+
+    <!-- Couleur d'ombre pour les tokens d'élévation (Shapes.xaml) — noir en light, -->
+    <!-- plus clair en dark pour rester visible sur fond sombre. -->
+    <Color x:Key="ShadowColor">#000000</Color>
+    <Color x:Key="ShadowColorDark">#000000</Color>
+
     <Color x:Key="White">White</Color>
     <Color x:Key="Black">Black</Color>
     <Color x:Key="Magenta">#D600AA</Color>

@@ -30,6 +30,10 @@ namespace ProxiBetApp.Services.Auth
             {
                 throw await AuthApiException.FromRefitExceptionAsync(ex);
             }
+            catch (Exception ex)
+            {
+                throw new NetworkException("Impossible de contacter le serveur. Vérifiez votre connexion.", ex);
+            }
         }
 
         public async Task LoginAsync(string email, string password)
@@ -46,6 +50,10 @@ namespace ProxiBetApp.Services.Auth
             catch (ApiException ex)
             {
                 throw await AuthApiException.FromRefitExceptionAsync(ex);
+            }
+            catch (Exception ex)
+            {
+                throw new NetworkException("Impossible de contacter le serveur. Vérifiez votre connexion.", ex);
             }
 
             await ApplySessionAsync(body);
@@ -68,6 +76,10 @@ namespace ProxiBetApp.Services.Auth
             {
                 throw await AuthApiException.FromRefitExceptionAsync(ex);
             }
+            catch (Exception ex)
+            {
+                throw new NetworkException("Impossible de contacter le serveur. Vérifiez votre connexion.", ex);
+            }
 
             _currentUserStore.CurrentUser = body;
             return body;
@@ -87,6 +99,10 @@ namespace ProxiBetApp.Services.Auth
             catch (ApiException ex)
             {
                 throw await AuthApiException.FromRefitExceptionAsync(ex);
+            }
+            catch (Exception ex)
+            {
+                throw new NetworkException("Impossible de contacter le serveur. Vérifiez votre connexion.", ex);
             }
 
             _currentUserStore.CurrentUser = body;

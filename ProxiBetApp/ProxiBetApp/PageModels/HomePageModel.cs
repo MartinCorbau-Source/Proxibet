@@ -5,22 +5,23 @@ using ProxiBetApp.Services.Theme;
 
 namespace ProxiBetApp.PageModels
 {
-    public partial class HomePageModel : ObservableObject
+    public partial class HomePageModel : PageModelBase
     {
         private readonly IAuthService _authService;
         private readonly IThemeService _themeService;
         private readonly CurrentUserStore _currentUserStore;
 
         [ObservableProperty]
-        private bool _isBusy;
-
-        [ObservableProperty]
-        private string? _errorMessage;
-
-        [ObservableProperty]
         private bool _isDarkMode;
 
         public AuthenticatedUser? User => _currentUserStore.CurrentUser;
+
+        public bool IsDevGalleryButtonVisible =>
+#if DEBUG
+            true;
+#else
+            false;
+#endif
 
         public HomePageModel(IAuthService authService, IThemeService themeService, CurrentUserStore currentUserStore)
         {
@@ -40,22 +41,13 @@ namespace ProxiBetApp.PageModels
         [RelayCommand]
         private async Task AppearingAsync()
         {
-            IsBusy = true;
-            ErrorMessage = null;
-
-            try
-            {
-                await _authService.GetMeAsync();
-            }
-            catch (AuthApiException)
-            {
-                await _authService.LogoutAsync();
-                await Shell.Current.GoToAsync("//login");
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            await ExecuteWithErrorHandlingAsync(
+                () => _authService.GetMeAsync(),
+                onAuthError: async _ =>
+                {
+                    await _authService.LogoutAsync();
+                    await Shell.Current.GoToAsync("//login");
+                });
         }
 
         [RelayCommand]
@@ -65,9 +57,9 @@ namespace ProxiBetApp.PageModels
         }
 
         [RelayCommand]
-        private static async Task GoToHomeAsync()
+        private static async Task GoToDevGalleryAsync()
         {
-            await Shell.Current.GoToAsync("//home");
+            await Shell.Current.GoToAsync("dev/gallery");
         }
 
         [RelayCommand]

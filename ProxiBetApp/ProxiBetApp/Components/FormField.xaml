@@ -3,6 +3,11 @@
 Champ de formulaire labellisé : remplace la paire <Label Text="..."/><Entry .../> dupliquée
 5 fois entre LoginPage et RegisterPage, et ajoute un slot d'erreur par champ (absent
 aujourd'hui, où seul un ErrorMessage global existe au niveau de la page).
+
+Conteneur "outlined" façon Material 3 : l'Entry est enveloppé dans un Border dont le Stroke
+réagit à l'état (repos = Outline, focus = Primary 2px, erreur = Error) — géré en code-behind
+(événements Focused/Unfocused + PropertyChanged sur ErrorMessage) plutôt qu'en pur XAML, MAUI
+n'ayant pas de VisualState déclenché par une BindableProperty custom comme ErrorMessage.
 -->
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
@@ -11,13 +16,55 @@ aujourd'hui, où seul un ErrorMessage global existe au niveau de la page).
 
     <VerticalStackLayout Spacing="{StaticResource size80}">
 
-        <Label Text="{Binding FieldLabel, Source={x:Reference Root}}" />
+        <Label Text="{Binding FieldLabel, Source={x:Reference Root}}"
+               Style="{StaticResource Caption1Strong}" />
 
-        <Entry x:Name="ValueEntry"
-               Placeholder="{Binding Placeholder, Source={x:Reference Root}}"
-               Keyboard="{Binding Keyboard, Source={x:Reference Root}}"
-               IsPassword="{Binding IsPassword, Source={x:Reference Root}}"
-               Text="{Binding Text, Source={x:Reference Root}, Mode=TwoWay}" />
+        <Border x:Name="EntryContainer"
+                Padding="{StaticResource size160},{StaticResource size80}">
+
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="{StaticResource CornerRadiusSmall}"/>
+            </Border.StrokeShape>
+
+            <!--
+            Trois états déclarés en XAML (couleurs via AppThemeBinding, comme partout ailleurs
+            dans le design system) ; le code-behind se contente de choisir l'état actif
+            (VisualStateManager.GoToState), il ne manipule aucune couleur en dur.
+            -->
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="FieldStates">
+                        <VisualState x:Name="Resting">
+                            <VisualState.Setters>
+                                <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Outline}, Dark={StaticResource OutlineDark}}" />
+                                <Setter Property="StrokeThickness" Value="1" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Focused">
+                            <VisualState.Setters>
+                                <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+                                <Setter Property="StrokeThickness" Value="2" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Error">
+                            <VisualState.Setters>
+                                <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Error}, Dark={StaticResource ErrorDark}}" />
+                                <Setter Property="StrokeThickness" Value="2" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </VisualStateManager.VisualStateGroups>
+
+            <Entry x:Name="ValueEntry"
+                   Placeholder="{Binding Placeholder, Source={x:Reference Root}}"
+                   Keyboard="{Binding Keyboard, Source={x:Reference Root}}"
+                   IsPassword="{Binding IsPassword, Source={x:Reference Root}}"
+                   Text="{Binding Text, Source={x:Reference Root}, Mode=TwoWay}"
+                   Focused="OnEntryFocused"
+                   Unfocused="OnEntryUnfocused" />
+
+        </Border>
 
         <ValidationMessage Text="{Binding ErrorMessage, Source={x:Reference Root}}" />
 

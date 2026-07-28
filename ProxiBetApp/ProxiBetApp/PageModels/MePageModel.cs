@@ -5,19 +5,13 @@ using ProxiBetApp.Services.Theme;
 
 namespace ProxiBetApp.PageModels
 {
-    public partial class MePageModel : ObservableObject
+    public partial class MePageModel : PageModelBase
     {
         private readonly IAuthService _authService;
         private readonly IThemeService _themeService;
 
         [ObservableProperty]
         private AuthenticatedUser? _user;
-
-        [ObservableProperty]
-        private bool _isBusy;
-
-        [ObservableProperty]
-        private string? _errorMessage;
 
         [ObservableProperty]
         private bool _isDarkMode;
@@ -39,22 +33,13 @@ namespace ProxiBetApp.PageModels
         [RelayCommand]
         private async Task AppearingAsync()
         {
-            IsBusy = true;
-            ErrorMessage = null;
-
-            try
-            {
-                User = await _authService.GetMeAsync();
-            }
-            catch (AuthApiException)
-            {
-                await _authService.LogoutAsync();
-                await Shell.Current.GoToAsync("//login");
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            await ExecuteWithErrorHandlingAsync(
+                async () => User = await _authService.GetMeAsync(),
+                onAuthError: async _ =>
+                {
+                    await _authService.LogoutAsync();
+                    await Shell.Current.GoToAsync("//login");
+                });
         }
 
         [RelayCommand]
@@ -64,10 +49,5 @@ namespace ProxiBetApp.PageModels
             await Shell.Current.GoToAsync("//login");
         }
 
-        [RelayCommand]
-        private static async Task GoToHomeAsync()
-        {
-            await Shell.Current.GoToAsync("//home");
-        }
     }
 }
