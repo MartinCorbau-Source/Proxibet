@@ -17,11 +17,11 @@
 
         <ValidationMessage Text="{Binding ErrorMessage}" />
 
-        <Button Text="Créer mon compte" Command="{Binding RegisterCommand}" />
+        <ProxiButton Text="Créer mon compte" Command="{Binding RegisterCommand}" />
 
         <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
 
-        <Button Text="J'ai déjà un compte" Command="{Binding GoToLoginCommand}" Style="{StaticResource SecondaryButtonStyle}" />
+        <ProxiButton Text="J'ai déjà un compte" Command="{Binding GoToLoginCommand}" Variant="Secondary" />
 
     </CenteredFormLayout>
 </ContentPage>

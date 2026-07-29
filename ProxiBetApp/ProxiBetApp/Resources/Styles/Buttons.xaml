@@ -19,12 +19,15 @@
     </Style>
 
     <!--
-    Style implicite (M3 "Filled button") : states Pressed/PointerOver réels via des state
+    Bouton primaire (M3 "Filled button") : states Pressed/PointerOver réels via des state
     layers dérivés de l'échelle Primary existante (500/600 = teintes plus soutenues que le
     Primary400 de repos), au lieu des VisualState vides d'origine qui ne changeaient rien
-    visuellement au clic/survol.
+    visuellement au clic/survol. x:Key explicite pour rester une cible de BasedOn valide
+    (voir note BaseButtonStyle) : consommé à la fois par le style implicite Button juste
+    en dessous et par les variantes de CornerRadius plus bas, pour éviter de dupliquer
+    couleur/VisualStates à chaque variante de radius.
     -->
-    <Style TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
+    <Style x:Key="PrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource White}}" />
         <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}" />
         <Setter Property="VisualStateManager.VisualStateGroups">
@@ -51,6 +54,9 @@
             </VisualStateGroupList>
         </Setter>
     </Style>
+
+    <!-- Style implicite : tout Button sans Style explicite reprend PrimaryButtonStyle tel quel. -->
+    <Style TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}" />
 
     <!-- Bouton secondaire / "lien" : remplace le pattern BackgroundColor=Transparent + -->
     <!-- TextColor=Primary dupliqué en dur dans LoginPage/RegisterPage. Reste un vrai -->
@@ -82,6 +88,73 @@
                 </VisualStateGroup>
             </VisualStateGroupList>
         </Setter>
+    </Style>
+
+    <!--
+    Bouton icône (glyph seul ou glyph+texte compact, ex. AppHeader/BottomNavBar) : distinct de
+    SecondaryButtonStyle bien que même logique de state-layer M3 léger. SecondaryButtonStyle est
+    pensé pour un bouton "lien" pleine largeur (Padding 24,12 hérité de BaseButtonStyle,
+    CornerRadiusFull) — sur un bouton icône de petite taille, le state-layer Pressed/PointerOver
+    suit ce CornerRadius pilule et donne un halo disproportionné par rapport à la taille réelle
+    du bouton. IconButtonStyle réduit le Padding (surface plus proche du contenu réel) et fixe
+    CornerRadius à ButtonCornerRadiusMedium (au lieu de la pilule). Réutilise les mêmes teintes
+    de state-layer que SecondaryButtonStyle (Primary50/Primary900) : seule la forme change, pas
+    la couleur. Pas de WidthRequest/HeightRequest fixe (contrairement à une itération précédente) :
+    un Button MAUI ne wrap pas son texte, une largeur imposée tronquait un libellé un peu long
+    ("Accueil" dans BottomNavBar) — le bouton se dimensionne selon son contenu comme n'importe
+    quel autre ProxiButton (MinimumWidthRequest/MinimumHeightRequest à 44, hérités de
+    BaseButtonStyle), la mise en page (répartition/centrage des items) reste la responsabilité du
+    conteneur (HorizontalStackLayout/Grid côté page), pas du style de bouton.
+    -->
+    <Style x:Key="IconButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+        <Setter Property="CornerRadius" Value="{StaticResource ButtonCornerRadiusMedium}" />
+        <Setter Property="Padding" Value="{StaticResource size80}" />
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="Pressed">
+                        <VisualState.Setters>
+                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Primary50}, Dark={StaticResource Primary900}}" />
+                        </VisualState.Setters>
+                    </VisualState>
+                    <VisualState x:Name="PointerOver">
+                        <VisualState.Setters>
+                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Primary50}, Dark={StaticResource Primary900}}" />
+                        </VisualState.Setters>
+                    </VisualState>
+                    <VisualState x:Name="Disabled">
+                        <VisualState.Setters>
+                            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}" />
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+
+    <!--
+    Variantes de CornerRadius, une par combinaison Variant x Radius consommée par le composant
+    ProxiButton (Components/ProxiButton.xaml.cs) : BaseButtonStyle impose CornerRadiusFull (pilule)
+    par défaut, ces styles héritent de PrimaryButtonStyle/SecondaryButtonStyle (couleur +
+    VisualStates inchangés) et ne surchargent que le radius. Jamais de CornerRadius en dur
+    côté page — ProxiButton résout Variant+Radius vers l'un de ces styles nommés en
+    code-behind (voir ProxiButton.xaml.cs, méthode UpdateStyle), qui référencent tous le
+    shape system existant.
+    -->
+    <Style x:Key="ButtonRoundedStyle" TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
+        <Setter Property="CornerRadius" Value="{StaticResource ButtonCornerRadiusMedium}" />
+    </Style>
+    <Style x:Key="ButtonSquareStyle" TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
+        <Setter Property="CornerRadius" Value="{StaticResource ButtonCornerRadiusSmall}" />
+    </Style>
+    <Style x:Key="SecondaryButtonRoundedStyle" TargetType="Button" BasedOn="{StaticResource SecondaryButtonStyle}">
+        <Setter Property="CornerRadius" Value="{StaticResource ButtonCornerRadiusMedium}" />
+    </Style>
+    <Style x:Key="SecondaryButtonSquareStyle" TargetType="Button" BasedOn="{StaticResource SecondaryButtonStyle}">
+        <Setter Property="CornerRadius" Value="{StaticResource ButtonCornerRadiusSmall}" />
     </Style>
 
 </ResourceDictionary>

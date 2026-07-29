@@ -9,6 +9,7 @@ dans Login/Register/Me.
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ProxiBetApp.Pages.Dev.ComponentGalleryPage"
              xmlns:dev="clr-namespace:ProxiBetApp.Pages.Dev"
+             xmlns:fonts="clr-namespace:Fonts"
              x:DataType="dev:ComponentGalleryPageModel"
              Shell.NavBarIsVisible="False"
              Title="Component Gallery">
@@ -20,52 +21,148 @@ dans Login/Register/Me.
 
         <VerticalStackLayout Padding="{StaticResource LayoutPadding}" Spacing="{StaticResource size320}">
 
-            <Label Style="{StaticResource Title1}" Text="Component Gallery" />
-
             <!-- Typography -->
-            <Label Style="{StaticResource Title2}" Text="Typography" />
-            <Label Style="{StaticResource LargeTitle}" Text="LargeTitle" />
             <Label Style="{StaticResource Title1}" Text="Title1" />
+            <Label Style="{StaticResource Title2}" Text="Title2" />
+            <Label Style="{StaticResource LargeTitle}" Text="LargeTitle" />
             <Label Style="{StaticResource Body1}" Text="Body1" />
             <Label Style="{StaticResource Caption1}" Text="Caption1" />
 
-            <!-- Buttons -->
-            <Label Style="{StaticResource Title2}" Text="Buttons" />
-            <Button Text="Bouton primaire" />
-            <Button Text="Bouton primaire désactivé" IsEnabled="False" />
-            <Button Text="Bouton secondaire" Style="{StaticResource SecondaryButtonStyle}" />
+            <!--
+            ProxiButton (Components/ProxiButton.xaml) : SEUL composant bouton de l'app, remplace
+            l'ancien usage direct de <Button Style="{StaticResource ...}"/>. Ne jamais utiliser
+            <Button> natif dans une Page/Component — toujours ProxiButton, pour garder un rendu
+            cohérent (couleur, radius, états Pressed/PointerOver/Disabled) sur toute l'app.
 
-            <!-- ValidationMessage -->
+            Deux BindableProperty pilotent le style, jamais de CornerRadius/couleur en dur :
+              - Variant="Primary" (défaut, bouton plein/coloré), "Secondary" (transparent/lien
+                pleine largeur) ou "Icon" (transparent, pensé pour un bouton icône seule ou
+                icône+texte compact, voir section dédiée plus bas)
+              - Radius="Full" (défaut, pilule), "Medium" ou "Small" — ignoré par Variant="Icon",
+                qui impose son propre CornerRadius fixe (IconButtonStyle dans Buttons.xaml)
+            IsEnabled/IsVisible/Command/CommandParameter sont supportés comme sur un Button natif.
+            -->
+            <Label Style="{StaticResource Title2}" Text="Buttons — texte simple" />
+            <ProxiButton Text="ProxiButton Primary/Full" Variant="Primary" Radius="Full" />
+            <ProxiButton Text="ProxiButton Primary/Medium" Variant="Primary" Radius="Medium" />
+            <ProxiButton Text="ProxiButton Primary/Small" Variant="Primary" Radius="Small" />
+            <ProxiButton Text="ProxiButton Secondary/Full" Variant="Secondary" Radius="Full" />
+            <ProxiButton Text="ProxiButton Secondary/Medium" Variant="Secondary" Radius="Medium" />
+            <ProxiButton Text="ProxiButton Secondary/Small" Variant="Secondary" Radius="Small" />
+            <ProxiButton Text="ProxiButton désactivé" Variant="Primary" Radius="Full" IsEnabled="False" />
+
+            <!--
+            Variant="Icon" : style dédié aux boutons icône (glyph seul ou glyph+texte compact),
+            à préférer à Secondary pour cet usage — voir IconButtonStyle dans Buttons.xaml pour
+            le détail (state-layer Pressed/PointerOver en rectangle à coins arrondis plutôt qu'en
+            pilule étirée). Le glyph (police FluentUI) transite par Text, comme un texte normal —
+            pas de propriété "IconGlyph" séparée. FontFamily="FluentUI" + FontSize (toujours
+            {StaticResource IconSize}, jamais une taille en dur) sont de simples passthrough vers
+            le Button interne. Voir Components/AppHeader.xaml pour un exemple réel (boutons
+            thème/profil de l'en-tête).
+            -->
+            <Label Style="{StaticResource Title2}" Text="Buttons — icône seule (Variant=Icon)" />
+            <ProxiButton Variant="Icon"
+                         Text="{x:Static fonts:FluentUI.person_circle_24_regular}"
+                         FontFamily="FluentUI"
+                         FontSize="{StaticResource IconSize}" />
+
+            <!--
+            Bouton icône + texte empilés : Text porte le vrai libellé, l'icône est une image
+            séparée assignée via la propriété de contenu ProxiButton.ImageSource (passthrough vers
+            Button.ImageSource), typiquement un FontImageSource FluentUI. ContentLayout="Top,4"
+            place l'icône au-dessus du texte avec 4px d'écart (Button.ContentLayout standard,
+            "Left"/"Right"/"Top"/"Bottom" + espacement). Voir Components/BottomNavBar.xaml pour
+            l'exemple réel (items de navigation "Accueil"/"Test") : préférer un vrai Button
+            (Command natif fiable sur toutes les plateformes) à un TapGestureRecognizer sur un
+            conteneur custom, plusieurs bugs Windows/WinUI documentés existent sur ce dernier
+            (voir le commentaire d'en-tête de BottomNavBar.xaml).
+            -->
+            <Label Style="{StaticResource Title2}" Text="Buttons — icône + texte (Variant=Icon)" />
+            <ProxiButton Variant="Icon"
+                         Text="Accueil"
+                         ContentLayout="Top,4"
+                         FontFamily="OpenSansRegular">
+                <ProxiButton.ImageSource>
+                    <FontImageSource FontFamily="FluentUI"
+                                     Glyph="{x:Static fonts:FluentUI.home_24_regular}"
+                                     Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+                </ProxiButton.ImageSource>
+            </ProxiButton>
+
+            <!--
+            ValidationMessage (Components/ValidationMessage.xaml) : message d'erreur sous un
+            champ ou en bas de formulaire. Se masque et ne réserve aucun espace tant que Text
+            est vide/null — pas besoin de IsVisible manuel, bindez ErrorMessage directement.
+            -->
             <Label Style="{StaticResource Title2}" Text="ValidationMessage" />
             <ValidationMessage Text="Ce champ est requis" />
             <Label Style="{StaticResource Caption1}" Text="(instance avec Text vide ci-dessous : ne prend pas de place)" />
             <ValidationMessage Text="" />
 
-            <!-- FormField -->
+            <!--
+            FormField (Components/FormField.xaml) : Label + Entry + ValidationMessage packagés,
+            à utiliser pour TOUT champ de formulaire au lieu de recomposer Label/Entry à la main.
+            Conteneur "outlined" qui réagit à l'état (repos/focus/erreur) automatiquement à
+            partir de ErrorMessage et du focus de l'Entry interne — rien à gérer côté page.
+            -->
             <Label Style="{StaticResource Title2}" Text="FormField" />
             <Label Style="{StaticResource Caption1}" Text="État repos (tap dans le champ ci-dessous pour voir l'état focus)" />
             <FormField FieldLabel="Email" Placeholder="vous@exemple.com" Keyboard="Email" />
             <Label Style="{StaticResource Caption1}" Text="État erreur" />
             <FormField FieldLabel="Mot de passe" Placeholder="Mot de passe" IsPassword="True" ErrorMessage="Mot de passe trop court" />
 
-            <!-- Card -->
+            <!--
+            ProxiCard (Components/ProxiCard.xaml) : SEUL composant carte de l'app, remplace
+            l'ancien style keyé CardStyle utilisé directement sur un Border. Jamais de
+            Background/Shadow/CornerRadius en dur sur un Border — toujours ProxiCard.
+
+            Trois BindableProperty pilotent le rendu :
+              - Color="Default" (défaut, fond neutre) ou "Primary" (fond teinté marque)
+              - HasShadow="True" (défaut, élévation Elevation1) ou "False" (surface plate)
+              - MaxWidth (double, défaut {StaticResource CardMaxWidth}=480 si non fourni)
+            Accepte un contenu enfant comme un layout classique (Label, FormField, un autre
+            composant ContentView comme CenteredFormLayout...).
+            -->
             <Label Style="{StaticResource Title2}" Text="Card" />
-            <Border Style="{StaticResource CardStyle}">
+            <ProxiCard>
                 <VerticalStackLayout Spacing="{StaticResource size80}">
                     <Label Text="Titre de carte" Style="{StaticResource Caption1}" />
                     <Label Text="Contenu de carte" Style="{StaticResource Body1Strong}" />
                 </VerticalStackLayout>
-            </Border>
+            </ProxiCard>
 
-            <!-- CenteredFormLayout -->
+            <Label Style="{StaticResource Caption1}" Text="Color=&quot;Primary&quot; (fond teinté marque)" />
+            <ProxiCard Color="Primary">
+                <VerticalStackLayout Spacing="{StaticResource size80}">
+                    <Label Text="Titre de carte" Style="{StaticResource Caption1}" />
+                    <Label Text="Contenu de carte" Style="{StaticResource Body1Strong}" />
+                </VerticalStackLayout>
+            </ProxiCard>
+
+            <Label Style="{StaticResource Caption1}" Text="HasShadow=&quot;False&quot; (surface plate, sans élévation)" />
+            <ProxiCard HasShadow="False">
+                <VerticalStackLayout Spacing="{StaticResource size80}">
+                    <Label Text="Titre de carte" Style="{StaticResource Caption1}" />
+                    <Label Text="Contenu de carte" Style="{StaticResource Body1Strong}" />
+                </VerticalStackLayout>
+            </ProxiCard>
+
+            <!--
+            CenteredFormLayout (Components/CenteredFormLayout.xaml) : shell ScrollView +
+            VerticalStackLayout centré/largeur max, à utiliser comme conteneur racine de toute
+            NOUVELLE page de formulaire (voir LoginPage/RegisterPage) plutôt que de dupliquer ce
+            pattern à la main. Accepte plusieurs enfants directs en XAML (Label, FormField,
+            ProxiButton...) comme un layout classique.
+            -->
             <Label Style="{StaticResource Title2}" Text="CenteredFormLayout" />
-            <Border Style="{StaticResource CardStyle}">
+            <ProxiCard>
                 <CenteredFormLayout>
                     <Label Style="{StaticResource Title1}" Text="Exemple de formulaire" HorizontalOptions="Center" />
                     <FormField FieldLabel="Email" Placeholder="vous@exemple.com" Keyboard="Email" />
-                    <Button Text="Valider" />
+                    <ProxiButton Text="Valider" />
                 </CenteredFormLayout>
-            </Border>
+            </ProxiCard>
 
         </VerticalStackLayout>
 
