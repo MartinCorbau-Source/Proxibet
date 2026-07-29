@@ -61,4 +61,8 @@
     <!-- indépendamment. -->
     <x:Double x:Key="CardMaxWidth">480</x:Double>
 
+    <x:Double x:Key="IconButtonMinSize">36</x:Double>
+
+    <x:Double x:Key="MinTapTarget">44</x:Double>
+
 </ResourceDictionary>

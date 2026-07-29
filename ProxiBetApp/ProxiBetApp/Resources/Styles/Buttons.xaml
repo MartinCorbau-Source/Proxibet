@@ -14,8 +14,8 @@
         <Setter Property="BorderWidth" Value="0"/>
         <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusFull}"/>
         <Setter Property="Padding" Value="24,12"/>
-        <Setter Property="MinimumHeightRequest" Value="44"/>
-        <Setter Property="MinimumWidthRequest" Value="44"/>
+        <Setter Property="MinimumHeightRequest" Value="{StaticResource MinTapTarget}"/>
+        <Setter Property="MinimumWidthRequest" Value="{StaticResource MinTapTarget}"/>
     </Style>
 
     <!--
@@ -91,26 +91,19 @@
     </Style>
 
     <!--
-    Bouton icône (glyph seul ou glyph+texte compact, ex. AppHeader/BottomNavBar) : distinct de
-    SecondaryButtonStyle bien que même logique de state-layer M3 léger. SecondaryButtonStyle est
-    pensé pour un bouton "lien" pleine largeur (Padding 24,12 hérité de BaseButtonStyle,
-    CornerRadiusFull) — sur un bouton icône de petite taille, le state-layer Pressed/PointerOver
-    suit ce CornerRadius pilule et donne un halo disproportionné par rapport à la taille réelle
-    du bouton. IconButtonStyle réduit le Padding (surface plus proche du contenu réel) et fixe
-    CornerRadius à ButtonCornerRadiusMedium (au lieu de la pilule). Réutilise les mêmes teintes
-    de state-layer que SecondaryButtonStyle (Primary50/Primary900) : seule la forme change, pas
-    la couleur. Pas de WidthRequest/HeightRequest fixe (contrairement à une itération précédente) :
-    un Button MAUI ne wrap pas son texte, une largeur imposée tronquait un libellé un peu long
-    ("Accueil" dans BottomNavBar) — le bouton se dimensionne selon son contenu comme n'importe
-    quel autre ProxiButton (MinimumWidthRequest/MinimumHeightRequest à 44, hérités de
-    BaseButtonStyle), la mise en page (répartition/centrage des items) reste la responsabilité du
-    conteneur (HorizontalStackLayout/Grid côté page), pas du style de bouton.
+    Bouton icône (glyph seul ou glyph+texte compact, ex. AppHeader/BottomNavBar). CornerRadius
+    fixe (pas la pilule de BaseButtonStyle) : sur un bouton non pleine-largeur, le state-layer
+    suivant un radius pilule produit un halo disproportionné. Pas de WidthRequest/HeightRequest
+    fixe : le bouton se dimensionne selon son contenu (voir IconButtonMinSize dans Spacing.xaml
+    pour le minimum réduit par rapport au 44 générique de BaseButtonStyle).
     -->
     <Style x:Key="IconButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
         <Setter Property="BackgroundColor" Value="Transparent" />
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
         <Setter Property="CornerRadius" Value="{StaticResource ButtonCornerRadiusMedium}" />
-        <Setter Property="Padding" Value="{StaticResource size80}" />
+        <Setter Property="Padding" Value="{StaticResource size60}" />
+        <Setter Property="MinimumHeightRequest" Value="{StaticResource IconButtonMinSize}" />
+        <Setter Property="MinimumWidthRequest" Value="{StaticResource IconButtonMinSize}" />
         <Setter Property="VisualStateManager.VisualStateGroups">
             <VisualStateGroupList>
                 <VisualStateGroup x:Name="CommonStates">

@@ -112,6 +112,22 @@ dans Login/Register/Me.
             <Label Style="{StaticResource Caption1}" Text="État erreur" />
             <FormField FieldLabel="Mot de passe" Placeholder="Mot de passe" IsPassword="True" ErrorMessage="Mot de passe trop court" />
 
+            <!-- RadioButton : contrôle natif stylé dans Controls.xaml, non encapsulé dans un composant custom. -->
+            <Label Style="{StaticResource Title2}" Text="RadioButton" />
+            <RadioButton Content="Option 1" GroupName="GalleryRadioDemo" IsChecked="True" />
+            <RadioButton Content="Option 2" GroupName="GalleryRadioDemo" />
+            <RadioButton Content="Option 3 (désactivée)" GroupName="GalleryRadioDemo" IsEnabled="False" />
+
+            <!-- CheckBox : contrôle natif stylé dans Controls.xaml. -->
+            <Label Style="{StaticResource Title2}" Text="CheckBox" />
+            <CheckBox IsChecked="True" />
+            <Label Style="{StaticResource Caption1}" Text="Désactivée" />
+            <CheckBox IsChecked="True" IsEnabled="False" />
+
+            <!-- Switch : contrôle natif stylé dans Controls.xaml. -->
+            <Label Style="{StaticResource Title2}" Text="Switch" />
+            <Switch IsToggled="True" />
+
             <!--
             ProxiCard (Components/ProxiCard.xaml) : SEUL composant carte de l'app, remplace
             l'ancien style keyé CardStyle utilisé directement sur un Border. Jamais de
@@ -147,6 +163,16 @@ dans Login/Register/Me.
                     <Label Text="Contenu de carte" Style="{StaticResource Body1Strong}" />
                 </VerticalStackLayout>
             </ProxiCard>
+
+            <!-- ActivityIndicator/ProgressBar/IndicatorView : contrôles natifs stylés dans Controls.xaml. -->
+            <Label Style="{StaticResource Title2}" Text="ActivityIndicator" />
+            <ActivityIndicator IsRunning="True" />
+
+            <Label Style="{StaticResource Title2}" Text="ProgressBar" />
+            <ProgressBar Progress="0.6" />
+
+            <Label Style="{StaticResource Title2}" Text="IndicatorView" />
+            <IndicatorView Count="4" Position="1" />
 
             <!--
             CenteredFormLayout (Components/CenteredFormLayout.xaml) : shell ScrollView +
