@@ -176,4 +176,6 @@
                 Value="{OnPlatform WinUI=None, Default=Bold}" />
     </Style>
 
+    <x:Double x:Key="ControlFontSize">14</x:Double>
+
 </ResourceDictionary>

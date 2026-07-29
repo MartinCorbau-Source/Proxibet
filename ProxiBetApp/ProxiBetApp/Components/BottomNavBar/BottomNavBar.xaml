@@ -29,10 +29,10 @@ colonne + un ProxiButton, comme documenté plus haut.
              x:Name="Root">
 
     <Grid BackgroundColor="{AppThemeBinding Light={StaticResource LightSecondaryBackground}, Dark={StaticResource DarkSecondaryBackground}}"
-          Padding="{StaticResource size80}">
+          Padding="{StaticResource size20}">
 
-        <Grid ColumnDefinitions="*,*"
-              ColumnSpacing="{StaticResource size160}"
+        <Grid ColumnDefinitions="*,*,*"
+              ColumnSpacing="{StaticResource size80}"
               HorizontalOptions="Center">
 
             <ProxiButton Grid.Column="0"
@@ -59,6 +59,21 @@ colonne + un ProxiButton, comme documenté plus haut.
                 <ProxiButton.ImageSource>
                     <FontImageSource FontFamily="FluentUI"
                                      Glyph="{x:Static fonts:FluentUI.apps_shield_20_regular}"
+                                     Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+                </ProxiButton.ImageSource>
+            </ProxiButton>
+
+            <ProxiButton Grid.Column="2"
+                         Variant="Icon"
+                         VerticalOptions="Fill"
+                         Command="{Binding GoToGalleryCommand, Source={x:Reference Root}}"
+                         IsVisible="{Binding IsGalleryButtonVisible, Source={x:Reference Root}}"
+                         Text="Gallery"
+                         ContentLayout="Top,4"
+                         FontFamily="OpenSansRegular">
+                <ProxiButton.ImageSource>
+                    <FontImageSource FontFamily="FluentUI"
+                                     Glyph="{x:Static fonts:FluentUI.beaker_24_regular}"
                                      Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
                 </ProxiButton.ImageSource>
             </ProxiButton>

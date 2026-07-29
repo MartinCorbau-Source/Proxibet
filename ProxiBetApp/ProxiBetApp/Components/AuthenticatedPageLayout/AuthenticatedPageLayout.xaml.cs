@@ -65,6 +65,7 @@ namespace ProxiBetApp.Components
             InitializeComponent();
 
             BottomNav.GoToHomeCommand = new Command(() => GoToHomeAsync().FireAndForgetSafeAsync());
+            BottomNav.GoToGalleryCommand = new Command(() => GoToGalleryAsync().FireAndForgetSafeAsync());
 
             PageContent.CollectionChanged += (_, _) =>
             {
@@ -85,6 +86,12 @@ namespace ProxiBetApp.Components
         {
             if (Shell.Current is not null)
                 await Shell.Current.GoToAsync("//home");
+        }
+
+        private static async Task GoToGalleryAsync()
+        {
+            if (Shell.Current is not null)
+                await Shell.Current.GoToAsync("dev/gallery");
         }
 
         private static bool IsAncestorOf(Element candidate, Element node)
