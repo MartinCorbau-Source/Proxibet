@@ -29,10 +29,10 @@
 
             <ValidationMessage Text="{Binding ErrorMessage}" />
 
-            <Button Text="[Debug] Component Gallery"
-                    Command="{Binding GoToDevGalleryCommand}"
-                    Style="{StaticResource SecondaryButtonStyle}"
-                    IsVisible="{Binding IsDevGalleryButtonVisible}" />
+            <ProxiButton Text="[Debug] Component Gallery"
+                         Command="{Binding GoToDevGalleryCommand}"
+                         Variant="Secondary"
+                         IsVisible="{Binding IsDevGalleryButtonVisible}" />
 
         </VerticalStackLayout>
 

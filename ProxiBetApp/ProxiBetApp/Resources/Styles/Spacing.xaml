@@ -20,6 +20,7 @@
     <x:Double x:Key="size480">48</x:Double>
     <x:Double x:Key="size520">52</x:Double>
     <x:Double x:Key="size560">56</x:Double>
+    <x:Double x:Key="size640">64</x:Double>
 
     <!-- https://fluent2.microsoft.design/typography/ -->
     <OnIdiom x:Key="IconSize"
@@ -53,5 +54,11 @@
     <!-- Spacing entre les éléments d'un formulaire (Login/Register/Me), extrait du -->
     <!-- Spacing="15" dupliqué en dur dans les 3 pages -->
     <x:Double x:Key="FormSpacing">15</x:Double>
+
+    <!-- Largeur max par défaut d'une ProxiCard quand MaxWidth n'est pas fourni explicitement -->
+    <!-- (Components/ProxiCard.xaml.cs). Valeur alignée sur FormMaxWidth par cohérence visuelle -->
+    <!-- actuelle, mais token distinct : les deux usages (formulaire vs card générique) évoluent -->
+    <!-- indépendamment. -->
+    <x:Double x:Key="CardMaxWidth">480</x:Double>
 
 </ResourceDictionary>

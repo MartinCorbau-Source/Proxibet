@@ -25,20 +25,20 @@ que déclaré via Shell.TitleView, pour éviter de dupliquer ce XAML par ShellCo
                Style="{StaticResource Title2}"
                VerticalOptions="Center" />
 
-        <Button Grid.Column="1"
-                Style="{StaticResource SecondaryButtonStyle}"
-                Command="{Binding ToggleThemeCommand, Source={x:Reference Root}}"
-                Text="{Binding IsDarkMode, Source={x:Reference Root}, Converter={StaticResource ThemeIconConverter}}"
-                FontFamily="FluentUI"
-                FontSize="{StaticResource IconSize}" />
+        <ProxiButton Grid.Column="1"
+                     Variant="Icon"
+                     Command="{Binding ToggleThemeCommand, Source={x:Reference Root}}"
+                     Text="{Binding IsDarkMode, Source={x:Reference Root}, Converter={StaticResource ThemeIconConverter}}"
+                     FontFamily="FluentUI"
+                     FontSize="{StaticResource IconSize}" />
 
-        <Button Grid.Column="2"
-                Style="{StaticResource SecondaryButtonStyle}"
-                Command="{Binding ProfileCommand, Source={x:Reference Root}}"
-                IsVisible="{Binding ShowProfileIcon, Source={x:Reference Root}}"
-                Text="{x:Static fonts:FluentUI.person_circle_24_regular}"
-                FontFamily="FluentUI"
-                FontSize="{StaticResource IconSize}" />
+        <ProxiButton Grid.Column="2"
+                     Variant="Icon"
+                     Command="{Binding ProfileCommand, Source={x:Reference Root}}"
+                     IsVisible="{Binding ShowProfileIcon, Source={x:Reference Root}}"
+                     Text="{x:Static fonts:FluentUI.person_circle_24_regular}"
+                     FontFamily="FluentUI"
+                     FontSize="{StaticResource IconSize}" />
 
     </Grid>
 

@@ -15,13 +15,13 @@
 
         <ValidationMessage Text="{Binding ErrorMessage}" />
 
-        <Button Text="Se connecter" Command="{Binding LoginCommand}" />
+        <ProxiButton Text="Se connecter" Command="{Binding LoginCommand}" />
 
         <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
 
-        <Button Text="Créer un compte" Command="{Binding GoToRegisterCommand}" Style="{StaticResource SecondaryButtonStyle}" />
+        <ProxiButton Text="Créer un compte" Command="{Binding GoToRegisterCommand}" Variant="Secondary" />
 
-        <Button Text="[Debug] Component Gallery" Command="{Binding GoToDevGalleryCommand}" Style="{StaticResource SecondaryButtonStyle}" IsVisible="{Binding IsDevGalleryButtonVisible}" />
+        <ProxiButton Text="[Debug] Component Gallery" Command="{Binding GoToDevGalleryCommand}" Variant="Secondary" IsVisible="{Binding IsDevGalleryButtonVisible}" />
 
     </CenteredFormLayout>
 </ContentPage>
