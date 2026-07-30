@@ -35,13 +35,6 @@
         <OnIdiom.Desktop>18</OnIdiom.Desktop>
     </OnIdiom>
 
-    <!-- Plus petit qu'IconSize : glyph empilé au-dessus d'un label dans BottomNavBar. -->
-    <OnIdiom x:Key="NavBarIconSize"
-             x:TypeArguments="x:Double"
-             Default="18">
-        <OnIdiom.Desktop>22</OnIdiom.Desktop>
-    </OnIdiom>
-
     <OnIdiom x:Key="LayoutPadding"
              x:TypeArguments="Thickness"
              Default="15">
@@ -79,8 +72,8 @@
     <!-- Compense la hauteur réelle du header flottant, à ajuster si AppHeader change de hauteur. -->
     <OnIdiom x:Key="HeaderOverlayContentPadding"
              x:TypeArguments="Thickness"
-             Default="0,52,0,0">
-        <OnIdiom.Desktop>0,60,0,0</OnIdiom.Desktop>
+             Default="0,0,0,0">
+        <OnIdiom.Desktop>0,0,0,0</OnIdiom.Desktop>
     </OnIdiom>
 
 </ResourceDictionary>

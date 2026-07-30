@@ -11,15 +11,34 @@ namespace ProxiBetApp
         {
             InitializeComponent();
             RegisterRoutes();
+            AddDebugTabs();
             CheckInitialRouteAsync(authService).FireAndForgetSafeAsync(errorHandler);
         }
 
         private static void RegisterRoutes()
         {
             Routing.RegisterRoute("register", typeof(RegisterPage));
-            Routing.RegisterRoute("me", typeof(MePage));
+        }
+
+        private void AddDebugTabs()
+        {
 #if DEBUG
-            Routing.RegisterRoute("dev/gallery", typeof(Pages.Dev.ComponentGalleryPage));
+            var galleryTab = new Tab
+            {
+                Title = "Gallery",
+                Route = "gallery",
+                Icon = new FontImageSource
+                {
+                    FontFamily = "FluentUI",
+                    Glyph = Fonts.FluentUI.beaker_24_regular
+                }
+            };
+            galleryTab.Items.Add(new ShellContent
+            {
+                ContentTemplate = new DataTemplate(typeof(Pages.Dev.ComponentGalleryPage)),
+                Route = "dev/gallery"
+            });
+            MainTabBar.Items.Add(galleryTab);
 #endif
         }
 

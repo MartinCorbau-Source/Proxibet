@@ -3,15 +3,11 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ProxiBetApp.Pages.Dev.ComponentGalleryPage"
-             xmlns:dev="clr-namespace:ProxiBetApp.Pages.Dev"
              xmlns:fonts="clr-namespace:Fonts"
-             x:DataType="dev:ComponentGalleryPageModel"
              Shell.NavBarIsVisible="False"
              Title="Component Gallery">
 
-    <AuthenticatedPageLayout ProfileCommand="{Binding NoOpCommand}"
-                             IsDarkMode="{Binding IsDarkMode}"
-                             ToggleThemeCommand="{Binding ToggleThemeCommand}">
+    <AuthenticatedPageLayout>
 
         <VerticalStackLayout Padding="{StaticResource LayoutPadding}" Spacing="{StaticResource size320}">
 

@@ -3,8 +3,6 @@
 AppHeader et le ScrollView de contenu partagent Grid.Row="0" (superposés, AppHeader en ZIndex="1")
 pour que le contenu défile derrière le header flottant. InnerLayout compense la hauteur du header
 via HeaderOverlayContentPadding, à ajuster si AppHeader change de hauteur.
-GoToHome est fixé en dur dans le code-behind (pas de BindableProperty) : identique sur tous les
-call sites existants.
 Shell.NavBarIsVisible="False" reste à déclarer sur la ContentPage hôte (propriété attachée Shell,
 non positionnable par un ContentView enfant).
 -->
@@ -14,21 +12,14 @@ non positionnable par un ContentView enfant).
              x:Name="Root">
 
     <ContentView.Content>
-        <Grid RowDefinitions="*,Auto">
+        <Grid>
 
-            <ScrollView Grid.Row="0">
+            <ScrollView>
                 <VerticalStackLayout x:Name="InnerLayout" Padding="{StaticResource HeaderOverlayContentPadding}" />
             </ScrollView>
 
-            <AppHeader Grid.Row="0"
-                       VerticalOptions="Start"
-                       ZIndex="1"
-                       ProfileCommand="{Binding ProfileCommand, Source={x:Reference Root}}"
-                       ShowProfileIcon="{Binding ShowProfileIcon, Source={x:Reference Root}}"
-                       IsDarkMode="{Binding IsDarkMode, Source={x:Reference Root}}"
-                       ToggleThemeCommand="{Binding ToggleThemeCommand, Source={x:Reference Root}}" />
-
-            <BottomNavBar Grid.Row="1" x:Name="BottomNav" />
+            <AppHeader VerticalOptions="Start"
+                       ZIndex="1" />
 
         </Grid>
     </ContentView.Content>

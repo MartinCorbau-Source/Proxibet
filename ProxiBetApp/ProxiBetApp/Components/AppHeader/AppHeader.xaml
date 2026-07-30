@@ -6,14 +6,10 @@ un Brush composite ne se partage pas proprement en StaticResource conditionnel L
 -->
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:utilities="clr-namespace:ProxiBetApp.Utilities"
-             xmlns:fonts="clr-namespace:Fonts"
              x:Class="ProxiBetApp.Components.AppHeader"
              x:Name="Root">
 
     <ContentView.Resources>
-        <utilities:ThemeIconConverter x:Key="ThemeIconConverter" />
-
         <LinearGradientBrush x:Key="HeaderBackgroundGradientLight" StartPoint="0,0" EndPoint="0,1">
             <GradientStop Color="{StaticResource HeaderOverlayBackground}" Offset="0.0" />
             <GradientStop Color="{StaticResource HeaderOverlayBackgroundTransparent}" Offset="1.0" />
@@ -24,26 +20,10 @@ un Brush composite ne se partage pas proprement en StaticResource conditionnel L
         </LinearGradientBrush>
     </ContentView.Resources>
 
-    <Grid ColumnDefinitions="*,Auto,Auto"
+    <Grid ColumnDefinitions="*,Auto"
           ColumnSpacing="{StaticResource size120}"
           Padding="{StaticResource HeaderPadding}"
           Background="{AppThemeBinding Light={StaticResource HeaderBackgroundGradientLight}, Dark={StaticResource HeaderBackgroundGradientDark}}">
-
-        <ProxiButton Grid.Column="1"
-                     Variant="Icon"
-                     Command="{Binding ToggleThemeCommand, Source={x:Reference Root}}"
-                     Text="{Binding IsDarkMode, Source={x:Reference Root}, Converter={StaticResource ThemeIconConverter}}"
-                     FontFamily="FluentUI"
-                     FontSize="{StaticResource IconSize}" />
-
-        <ProxiButton Grid.Column="2"
-                     Variant="Icon"
-                     Command="{Binding ProfileCommand, Source={x:Reference Root}}"
-                     IsVisible="{Binding ShowProfileIcon, Source={x:Reference Root}}"
-                     Text="{x:Static fonts:FluentUI.person_circle_24_regular}"
-                     FontFamily="FluentUI"
-                     FontSize="{StaticResource IconSize}" />
-
     </Grid>
 
 </ContentView>
