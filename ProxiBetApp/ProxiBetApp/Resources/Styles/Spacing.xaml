@@ -37,8 +37,8 @@
 
     <OnIdiom x:Key="LayoutPadding"
              x:TypeArguments="Thickness"
-             Default="15">
-        <OnIdiom.Desktop>30</OnIdiom.Desktop>
+             Default="5">
+        <OnIdiom.Desktop>5</OnIdiom.Desktop>
     </OnIdiom>
 
     <OnIdiom x:Key="LayoutSpacing"
@@ -55,8 +55,6 @@
 
     <x:Double x:Key="FormMaxWidth">480</x:Double>
     <x:Double x:Key="FormSpacing">15</x:Double>
-
-    <x:Double x:Key="CardMaxWidth">480</x:Double>
 
     <x:Double x:Key="IconButtonMinSize">36</x:Double>
 

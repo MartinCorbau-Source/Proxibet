@@ -17,7 +17,7 @@
 
     <AuthenticatedPageLayout>
 
-        <VerticalStackLayout Padding="{StaticResource LayoutPadding}" Spacing="{StaticResource FormSpacing}" MaximumWidthRequest="{StaticResource FormMaxWidth}" HorizontalOptions="Center" VerticalOptions="Center">
+        <VerticalStackLayout Padding="{StaticResource LayoutPadding}" Spacing="{StaticResource FormSpacing}" VerticalOptions="Center">
 
             <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
 

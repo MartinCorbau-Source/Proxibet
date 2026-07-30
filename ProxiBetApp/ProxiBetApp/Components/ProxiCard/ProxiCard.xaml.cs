@@ -26,9 +26,9 @@ namespace ProxiBetApp.Components
             true,
             propertyChanged: OnStyleAffectingPropertyChanged);
 
-        // Défaut -1 ("non défini") : applique CardMaxWidth (Resources/Styles/Spacing.xaml)
-        // tant que la page consommatrice ne fournit pas explicitement une valeur >= 0, même
-        // logique de non-écrasement que ProxiButton.FontSizeProperty.
+        // Défaut -1 ("non défini") : pas de largeur max (pleine largeur) tant que la page
+        // consommatrice ne fournit pas explicitement une valeur >= 0, même logique de
+        // non-écrasement que ProxiButton.FontSizeProperty.
         public static readonly BindableProperty MaxWidthProperty = BindableProperty.Create(
             nameof(MaxWidth),
             typeof(double),
@@ -118,7 +118,7 @@ namespace ProxiBetApp.Components
         {
             InnerBorder.MaximumWidthRequest = MaxWidth >= 0
                 ? MaxWidth
-                : (double)Application.Current!.Resources["CardMaxWidth"];
+                : double.PositiveInfinity;
         }
 
         static bool IsAncestorOf(Element candidate, Element node)
