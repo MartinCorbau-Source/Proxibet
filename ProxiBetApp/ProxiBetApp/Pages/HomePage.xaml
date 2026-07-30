@@ -26,10 +26,14 @@
 
             <ValidationMessage Text="{Binding ErrorMessage}" />
 
-            <ProxiButton Text="[Debug] Component Gallery"
-                         Command="{Binding GoToDevGalleryCommand}"
-                         Variant="Secondary"
-                         IsVisible="{Binding IsDevGalleryButtonVisible}" />
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource size160}">
+                <ProxiCard Grid.Column="0">
+                    <Label Text="Futur composant A" Style="{StaticResource Body1Strong}" />
+                </ProxiCard>
+                <ProxiCard Grid.Column="1">
+                    <Label Text="Futur composant B" Style="{StaticResource Body1Strong}" />
+                </ProxiCard>
+            </Grid>
 
         </VerticalStackLayout>
 

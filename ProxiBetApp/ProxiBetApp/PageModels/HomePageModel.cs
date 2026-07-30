@@ -11,13 +11,6 @@ namespace ProxiBetApp.PageModels
 
         public AuthenticatedUser? User => _currentUserStore.CurrentUser;
 
-        public bool IsDevGalleryButtonVisible =>
-#if DEBUG
-            true;
-#else
-            false;
-#endif
-
         public HomePageModel(IAuthService authService, CurrentUserStore currentUserStore)
         {
             _authService = authService;
@@ -40,12 +33,6 @@ namespace ProxiBetApp.PageModels
                     await _authService.LogoutAsync();
                     await Shell.Current.GoToAsync("//login");
                 });
-        }
-
-        [RelayCommand]
-        private static async Task GoToDevGalleryAsync()
-        {
-            await Shell.Current.GoToAsync("dev/gallery");
         }
     }
 }
