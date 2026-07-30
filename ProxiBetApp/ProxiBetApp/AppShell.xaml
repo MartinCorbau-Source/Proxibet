@@ -12,12 +12,7 @@
         ContentTemplate="{DataTemplate pages:LoginPage}"
         Route="login" />
 
-    <!--
-    Pas de TabBar Shell natif : sur Windows, le renderer WinUI n'affiche aucune tab bar
-    visible avec un seul ShellContent (contrairement à Android/iOS). La navigation entre
-    sections authentifiées est assurée par Components/BottomNavBar, embarqué dans chaque
-    page, pour un rendu identique sur toutes les plateformes.
-    -->
+    <!-- Pas de TabBar Shell natif (invisible sur Windows avec un seul ShellContent) : navigation via BottomNavBar. -->
     <ShellContent
         Title="Accueil"
         ContentTemplate="{DataTemplate pages:HomePage}"

@@ -15,8 +15,7 @@
             Command="{Binding AppearingCommand}" />
     </ContentPage.Behaviors>
 
-    <AuthenticatedPageLayout HeaderTitle="Accueil"
-                             ProfileCommand="{Binding GoToProfileCommand}"
+    <AuthenticatedPageLayout ProfileCommand="{Binding GoToProfileCommand}"
                              IsDarkMode="{Binding IsDarkMode}"
                              ToggleThemeCommand="{Binding ToggleThemeCommand}">
 

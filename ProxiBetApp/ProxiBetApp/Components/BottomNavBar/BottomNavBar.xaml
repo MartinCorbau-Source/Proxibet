@@ -1,26 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--
-Barre de navigation custom, fixe en bas des pages authentifiées. Remplace le TabBar Shell
-natif : sur Windows, le renderer Shell WinUI n'affiche aucune tab bar visible tant qu'il n'y
-a qu'un seul ShellContent dans le TabBar (contrairement à Android/iOS) — inadapté tant que
-l'app n'a qu'une seule section "Accueil". Ce composant garantit un rendu identique sur
-toutes les plateformes, y compris avec un seul item, et reste simple à étendre (ajouter un
-item = dupliquer un ProxiButton ci-dessous) sans dépendre du nombre d'onglets Shell.
-
-Chaque item est un ProxiButton Variant="Icon" (Text+ImageSource+ContentLayout="Top,4"), pas un
-composant dédié type "NavBarItem" avec TapGestureRecognizer : un Button natif a un Command fiable
-sur toutes les plateformes, alors qu'un TapGestureRecognizer sur un ContentView/Grid a plusieurs
-bugs Windows/WinUI documentés et non résolus dans l'écosystème MAUI actuel (voir
-https://github.com/dotnet/maui/issues/32279 notamment — un tap qui ne remonte pas au Command
-bindé, malgré un XAML correct). VerticalOptions="Fill" sur chaque bouton pour que toute la
-hauteur de la barre reste zone cliquable, pas seulement la hauteur de son contenu visuel.
-
-Largeur des items égalisée via Grid ColumnDefinitions="*,*" (une colonne par item, largeur
-proportionnelle égale) plutôt qu'un WidthRequest fixe sur IconButtonStyle : chaque ProxiButton
-garde HorizontalOptions="Fill" par défaut, donc s'étire pour occuper toute sa colonne sans jamais
-contraindre la largeur minimale du contenu (ce qui avait causé la troncature de "Accueil" dans
-une itération précédente, voir IconButtonStyle dans Buttons.xaml). Ajouter un item = ajouter une
-colonne + un ProxiButton, comme documenté plus haut.
+Remplace le TabBar Shell natif : sur Windows, le renderer WinUI n'affiche pas de tab bar tant
+qu'il n'y a qu'un seul ShellContent. ProxiButton (pas un TapGestureRecognizer custom) : ce
+dernier ne reçoit pas les taps sur Windows, bug WinUI non résolu (dotnet/maui#32279).
 -->
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
@@ -45,7 +27,8 @@ colonne + un ProxiButton, comme documenté plus haut.
                 <ProxiButton.ImageSource>
                     <FontImageSource FontFamily="FluentUI"
                                      Glyph="{x:Static fonts:FluentUI.home_24_regular}"
-                                     Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+                                     Size="{StaticResource NavBarIconSize}"
+                                     Color="{AppThemeBinding Light={StaticResource DarkOnLightBackground}, Dark={StaticResource LightOnDarkBackground}}" />
                 </ProxiButton.ImageSource>
             </ProxiButton>
 
@@ -59,7 +42,8 @@ colonne + un ProxiButton, comme documenté plus haut.
                 <ProxiButton.ImageSource>
                     <FontImageSource FontFamily="FluentUI"
                                      Glyph="{x:Static fonts:FluentUI.apps_shield_20_regular}"
-                                     Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+                                     Size="{StaticResource NavBarIconSize}"
+                                     Color="{AppThemeBinding Light={StaticResource DarkOnLightBackground}, Dark={StaticResource LightOnDarkBackground}}" />
                 </ProxiButton.ImageSource>
             </ProxiButton>
 
@@ -74,7 +58,8 @@ colonne + un ProxiButton, comme documenté plus haut.
                 <ProxiButton.ImageSource>
                     <FontImageSource FontFamily="FluentUI"
                                      Glyph="{x:Static fonts:FluentUI.beaker_24_regular}"
-                                     Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+                                     Size="{StaticResource NavBarIconSize}"
+                                     Color="{AppThemeBinding Light={StaticResource DarkOnLightBackground}, Dark={StaticResource LightOnDarkBackground}}" />
                 </ProxiButton.ImageSource>
             </ProxiButton>
 

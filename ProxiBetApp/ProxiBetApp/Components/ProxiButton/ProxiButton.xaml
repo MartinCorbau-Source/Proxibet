@@ -1,21 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--
-Bouton paramétrable en Variant (Primary/Secondary/Icon) et Radius (Full/Medium/Small, ignoré par
-Icon), pour éviter de multiplier les styles nommés par combinaison côté page (PrimaryButtonStyle,
-ButtonRoundedStyle, SecondaryButtonSquareStyle...). ProxiButton résout les deux BindableProperty
-vers l'un des 7 styles de Resources/Styles/Buttons.xaml en code-behind (voir UpdateStyle) : la
-page choisit un couple Variant+Radius, jamais un CornerRadius ou une couleur en dur. Variant="Icon"
-(résolu vers IconButtonStyle) est le style dédié aux boutons icône (glyph seul ou glyph+texte
-compact, voir AppHeader/BottomNavBar) : à réserver à cet usage plutôt que Primary/Secondary, dont
-le state-layer Pressed/PointerOver est pensé pour un bouton pleine largeur (voir IconButtonStyle
-dans Buttons.xaml pour le détail du problème que ça évite).
-
-FontFamily/ImageSource/ContentLayout sont de simples passthrough vers le Button interne, pour
-les boutons-icônes (glyph seul via Text+FontFamily, ou icône+texte via ImageSource/ContentLayout,
-voir AppHeader/BottomNavBar) : usage circonstanciel, donc laissé au choix de la page consommatrice
-plutôt qu'internalisé ici. FontSize et Padding sont gérés uniquement en code-behind (pas de binding
-XAML direct) pour ne pas écraser le FontSize/Padding du style quand ils ne sont pas explicitement
-fournis (voir FontSizeProperty/PaddingProperty).
+Variant+Radius résolus en code-behind (UpdateStyle) vers l'un des styles de Buttons.xaml.
+FontSize/Padding ne sont pas bindés en XAML direct : appliqués seulement en code-behind pour ne
+pas écraser le style résolu quand ils ne sont pas explicitement fournis.
 -->
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"

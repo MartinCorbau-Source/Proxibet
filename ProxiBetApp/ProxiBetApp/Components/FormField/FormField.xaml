@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--
-Champ de formulaire labellisé : remplace la paire <Label Text="..."/><Entry .../> dupliquée
-5 fois entre LoginPage et RegisterPage, et ajoute un slot d'erreur par champ (absent
-aujourd'hui, où seul un ErrorMessage global existe au niveau de la page).
-
-Conteneur "outlined" façon Material 3 : l'Entry est enveloppé dans un Border dont le Stroke
-réagit à l'état (repos = Outline, focus = Primary 2px, erreur = Error) — géré en code-behind
-(événements Focused/Unfocused + PropertyChanged sur ErrorMessage) plutôt qu'en pur XAML, MAUI
-n'ayant pas de VisualState déclenché par une BindableProperty custom comme ErrorMessage.
+Stroke du Border réagit à l'état (repos/focus/erreur) via VisualStateManager.GoToState en
+code-behind, pas en pur XAML : MAUI n'a pas de VisualState déclenché par une BindableProperty
+custom comme ErrorMessage.
 -->
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
@@ -20,17 +15,12 @@ n'ayant pas de VisualState déclenché par une BindableProperty custom comme Err
                Style="{StaticResource Caption1Strong}" />
 
         <Border x:Name="EntryContainer"
-                Padding="{StaticResource size160},{StaticResource size80}">
+                Padding="{StaticResource size120},{StaticResource size60}">
 
             <Border.StrokeShape>
                 <RoundRectangle CornerRadius="{StaticResource CornerRadiusSmall}"/>
             </Border.StrokeShape>
 
-            <!--
-            Trois états déclarés en XAML (couleurs via AppThemeBinding, comme partout ailleurs
-            dans le design system) ; le code-behind se contente de choisir l'état actif
-            (VisualStateManager.GoToState), il ne manipule aucune couleur en dur.
-            -->
             <VisualStateManager.VisualStateGroups>
                 <VisualStateGroupList>
                     <VisualStateGroup x:Name="FieldStates">

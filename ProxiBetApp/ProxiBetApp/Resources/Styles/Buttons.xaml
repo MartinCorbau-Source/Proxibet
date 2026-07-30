@@ -3,11 +3,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <!--
-    Base commune (explicite, x:Key requis pour être une cible de BasedOn — MAUI ne permet
-    pas de faire hériter un style d'un style implicite non-keyé, contrairement à WPF).
-    Le style implicite Button et SecondaryButtonStyle en héritent tous les deux.
-    -->
+    <!-- x:Key requis pour être une cible de BasedOn (MAUI n'autorise pas d'hériter d'un style implicite non-keyé). -->
     <Style x:Key="BaseButtonStyle" TargetType="Button">
         <Setter Property="FontFamily" Value="OpenSansSemibold"/>
         <Setter Property="FontSize" Value="16"/>
@@ -18,15 +14,6 @@
         <Setter Property="MinimumWidthRequest" Value="{StaticResource MinTapTarget}"/>
     </Style>
 
-    <!--
-    Bouton primaire (M3 "Filled button") : states Pressed/PointerOver réels via des state
-    layers dérivés de l'échelle Primary existante (500/600 = teintes plus soutenues que le
-    Primary400 de repos), au lieu des VisualState vides d'origine qui ne changeaient rien
-    visuellement au clic/survol. x:Key explicite pour rester une cible de BasedOn valide
-    (voir note BaseButtonStyle) : consommé à la fois par le style implicite Button juste
-    en dessous et par les variantes de CornerRadius plus bas, pour éviter de dupliquer
-    couleur/VisualStates à chaque variante de radius.
-    -->
     <Style x:Key="PrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource White}}" />
         <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}" />
@@ -58,11 +45,6 @@
     <!-- Style implicite : tout Button sans Style explicite reprend PrimaryButtonStyle tel quel. -->
     <Style TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}" />
 
-    <!-- Bouton secondaire / "lien" : remplace le pattern BackgroundColor=Transparent + -->
-    <!-- TextColor=Primary dupliqué en dur dans LoginPage/RegisterPage. Reste un vrai -->
-    <!-- Button (Command, accessibilité, VisualStates hérités via BasedOn). Pressed/PointerOver -->
-    <!-- utilisent une teinte de fond très légère (state layer M3 "text button") plutôt qu'un -->
-    <!-- Transparent figé, pour donner un retour visuel au clic. -->
     <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
         <Setter Property="BackgroundColor" Value="Transparent" />
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
@@ -90,13 +72,7 @@
         </Setter>
     </Style>
 
-    <!--
-    Bouton icône (glyph seul ou glyph+texte compact, ex. AppHeader/BottomNavBar). CornerRadius
-    fixe (pas la pilule de BaseButtonStyle) : sur un bouton non pleine-largeur, le state-layer
-    suivant un radius pilule produit un halo disproportionné. Pas de WidthRequest/HeightRequest
-    fixe : le bouton se dimensionne selon son contenu (voir IconButtonMinSize dans Spacing.xaml
-    pour le minimum réduit par rapport au 44 générique de BaseButtonStyle).
-    -->
+    <!-- CornerRadius fixe (pas la pilule de BaseButtonStyle) : évite un halo state-layer disproportionné sur un bouton non pleine-largeur. -->
     <Style x:Key="IconButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
         <Setter Property="BackgroundColor" Value="Transparent" />
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
@@ -128,15 +104,7 @@
         </Setter>
     </Style>
 
-    <!--
-    Variantes de CornerRadius, une par combinaison Variant x Radius consommée par le composant
-    ProxiButton (Components/ProxiButton.xaml.cs) : BaseButtonStyle impose CornerRadiusFull (pilule)
-    par défaut, ces styles héritent de PrimaryButtonStyle/SecondaryButtonStyle (couleur +
-    VisualStates inchangés) et ne surchargent que le radius. Jamais de CornerRadius en dur
-    côté page — ProxiButton résout Variant+Radius vers l'un de ces styles nommés en
-    code-behind (voir ProxiButton.xaml.cs, méthode UpdateStyle), qui référencent tous le
-    shape system existant.
-    -->
+    <!-- Variantes de CornerRadius par combinaison Variant x Radius, résolues par ProxiButton.UpdateStyle. -->
     <Style x:Key="ButtonRoundedStyle" TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
         <Setter Property="CornerRadius" Value="{StaticResource ButtonCornerRadiusMedium}" />
     </Style>

@@ -4,12 +4,6 @@ namespace ProxiBetApp.Components
 {
     public partial class AppHeader : ContentView
     {
-        public static readonly BindableProperty HeaderTitleProperty = BindableProperty.Create(
-            nameof(HeaderTitle),
-            typeof(string),
-            typeof(AppHeader),
-            string.Empty);
-
         public static readonly BindableProperty ProfileCommandProperty = BindableProperty.Create(
             nameof(ProfileCommand),
             typeof(ICommand),
@@ -31,12 +25,6 @@ namespace ProxiBetApp.Components
             typeof(bool),
             typeof(AppHeader),
             false);
-
-        public string HeaderTitle
-        {
-            get => (string)GetValue(HeaderTitleProperty);
-            set => SetValue(HeaderTitleProperty, value);
-        }
 
         public ICommand? ProfileCommand
         {
