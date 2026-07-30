@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/maui/global"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:pages="clr-namespace:ProxiBetApp.Pages"
+    xmlns:fonts="clr-namespace:Fonts"
     Shell.FlyoutBehavior="Disabled"
     Title="ProxiBetApp">
 
@@ -12,10 +13,20 @@
         ContentTemplate="{DataTemplate pages:LoginPage}"
         Route="login" />
 
-    <!-- Pas de TabBar Shell natif (invisible sur Windows avec un seul ShellContent) : navigation via BottomNavBar. -->
-    <ShellContent
-        Title="Accueil"
-        ContentTemplate="{DataTemplate pages:HomePage}"
-        Route="home" />
+    <TabBar x:Name="MainTabBar" Route="app">
+        <Tab Title="Accueil" Route="home">
+            <Tab.Icon>
+                <FontImageSource FontFamily="FluentUI" Glyph="{x:Static fonts:FluentUI.home_24_regular}" />
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate pages:HomePage}" Route="home" />
+        </Tab>
+
+        <Tab Title="Profil" Route="me">
+            <Tab.Icon>
+                <FontImageSource FontFamily="FluentUI" Glyph="{x:Static fonts:FluentUI.person_circle_24_regular}" />
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate pages:MePage}" Route="me" />
+        </Tab>
+    </TabBar>
 
 </Shell>
