@@ -13,9 +13,6 @@ namespace ProxiBetApp.Components
     [ContentProperty(nameof(PageContent))]
     public partial class AuthenticatedPageLayout : ContentView
     {
-        public static readonly BindableProperty HeaderTitleProperty = BindableProperty.Create(
-            nameof(HeaderTitle), typeof(string), typeof(AuthenticatedPageLayout), string.Empty);
-
         public static readonly BindableProperty ProfileCommandProperty = BindableProperty.Create(
             nameof(ProfileCommand), typeof(ICommand), typeof(AuthenticatedPageLayout));
 
@@ -27,12 +24,6 @@ namespace ProxiBetApp.Components
 
         public static readonly BindableProperty IsDarkModeProperty = BindableProperty.Create(
             nameof(IsDarkMode), typeof(bool), typeof(AuthenticatedPageLayout), false);
-
-        public string HeaderTitle
-        {
-            get => (string)GetValue(HeaderTitleProperty);
-            set => SetValue(HeaderTitleProperty, value);
-        }
 
         public ICommand? ProfileCommand
         {
@@ -80,6 +71,18 @@ namespace ProxiBetApp.Components
                     InnerLayout.Children.Add(child);
                 }
             };
+
+            // Les insets système (zone de geste Android en edge-to-edge) sont dispatchés à la
+            // Page hôte, pas à un ContentView imbriqué : positionner SafeAreaEdges ici plutôt
+            // que dans BottomNavBar, qui ne les reçoit jamais. Bord bas uniquement, pour que le
+            // fond de BottomNavBar (Grid.Row="1") s'étende jusqu'au bord physique de l'écran.
+            ParentChanged += (_, _) =>
+            {
+                if (FindHostPage(this) is ContentPage hostPage)
+                {
+                    hostPage.SafeAreaEdges = new SafeAreaEdges(SafeAreaRegions.None, SafeAreaRegions.None, SafeAreaRegions.None, SafeAreaRegions.All);
+                }
+            };
         }
 
         private static async Task GoToHomeAsync()
@@ -102,6 +105,16 @@ namespace ProxiBetApp.Components
                     return true;
             }
             return false;
+        }
+
+        private static Page? FindHostPage(Element node)
+        {
+            for (var current = node.Parent; current is not null; current = current.Parent)
+            {
+                if (current is Page page)
+                    return page;
+            }
+            return null;
         }
     }
 }

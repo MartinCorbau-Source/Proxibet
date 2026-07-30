@@ -3,34 +3,17 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <!--
-    Shape system façon Material 3 : une échelle de rayons unique consommée par
-    Buttons/Cards/Inputs au lieu de valeurs (8, 20...) dupliquées en dur par fichier.
-    "Full" sert aux formes pilule (boutons, chips futurs).
-    -->
     <x:Double x:Key="CornerRadiusSmall">8</x:Double>
     <x:Double x:Key="CornerRadiusMedium">12</x:Double>
     <x:Double x:Key="CornerRadiusLarge">16</x:Double>
     <x:Int32 x:Key="CornerRadiusFull">999</x:Int32>
 
-    <!--
-    Variantes Int32 de CornerRadiusSmall/Medium, dédiées à Button.CornerRadius (un int côté
-    MAUI, contrairement à RoundRectangle.CornerRadius qui accepte un double) : consommées
-    uniquement par ButtonRoundedStyle/ButtonSquareStyle (Buttons.xaml). Mêmes valeurs que
-    CornerRadiusSmall/Medium ci-dessus, dupliquées en type plutôt qu'en source de vérité —
-    même pattern que CornerRadiusFull (voir la règle sur le type XAML qui doit correspondre
-    exactement au type CLR consommé).
-    -->
+    <!-- Variantes Int32 (Button.CornerRadius est un int, contrairement à RoundRectangle.CornerRadius) -->
     <x:Int32 x:Key="ButtonCornerRadiusSmall">8</x:Int32>
     <x:Int32 x:Key="ButtonCornerRadiusMedium">12</x:Int32>
 
-    <!--
-    Tokens d'élévation : Radius/Opacity/Offset par niveau, PAS de Shadow instancié ici.
-    En MAUI, Shadow hérite de Element (un seul Parent possible) : une seule instance en
-    StaticResource plantera dès qu'un 2e Border la consomme ("already has a Parent"). Chaque
-    style doit donc créer son propre <Shadow> inline en réutilisant ces valeurs numériques.
-    Échelle inspirée de la shadow ramp Fluent 2/Material (blur croissant par niveau).
-    -->
+    <!-- Pas de Shadow instancié ici : Shadow hérite de Element (un seul Parent), une instance -->
+    <!-- partagée plante dès qu'un 2e Border la consomme. Instancier <Shadow> inline par style. -->
     <x:Double x:Key="Elevation1Radius">4</x:Double>
     <x:Single x:Key="Elevation1Opacity">0.1</x:Single>
     <x:Double x:Key="Elevation2Radius">8</x:Double>

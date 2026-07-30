@@ -3,9 +3,6 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <!-- Style Border implicite unique (fusion de l'ancien Styles.xaml + AppStyles.xaml -->
-    <!-- variante retenue : AppStyles.xaml). Radius aligné sur le shape system (Shapes.xaml) -->
-    <!-- au lieu de la valeur 20 dupliquée en dur. -->
     <Style TargetType="Border">
         <Setter Property="StrokeShape">
             <Setter.Value>
@@ -16,13 +13,6 @@
         <Setter Property="Padding" Value="{OnIdiom 15, Desktop=20}"/>
     </Style>
 
-    <!--
-    CardStyle : élévation ajoutée (Shadow instancié inline, voir la note de Shapes.xaml sur
-    le partage d'instance Shadow). Niveau Elevation1 : une card reste une surface "au repos",
-    pas un élément flottant (réservé à des composants futurs type FAB/menu). Consommé par
-    Components/ProxiCard.xaml.cs (Color="Default"), qui retire le Shadow en code-behind
-    quand HasShadow="False" plutôt que de le conditionner ici.
-    -->
     <Style TargetType="Border" x:Key="CardStyle">
         <Setter Property="StrokeShape">
             <Setter.Value>
@@ -42,9 +32,6 @@
         </Setter>
     </Style>
 
-    <!-- CardPrimaryStyle : variante Color="Primary" de ProxiCard, fond teinté marque -->
-    <!-- (Primary50/Primary900) au lieu du fond neutre de CardStyle. Hérite du reste -->
-    <!-- (radius, padding, Shadow) via BasedOn, ne surcharge que Background. -->
     <Style TargetType="Border" x:Key="CardPrimaryStyle" BasedOn="{StaticResource CardStyle}">
         <Setter Property="Background" Value="{AppThemeBinding Light={StaticResource Primary50}, Dark={StaticResource Primary900}}"/>
     </Style>

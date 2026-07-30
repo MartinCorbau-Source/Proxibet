@@ -30,12 +30,6 @@
         </Setter>
     </Style>
 
-    <!--
-    Headline/SubHeadline : recolorées sur l'échelle Primary (Primary700 light / Primary200
-    dark) au lieu de MidnightBlue, une couleur hors palette qui ne suivait pas le contraste
-    vérifié WCAG des autres tokens texte. FontFamily Semibold ajoutée pour un vrai poids de
-    titre (elles n'en avaient aucune, donc héritaient du Regular du Label implicite).
-    -->
     <Style TargetType="Label" x:Key="Headline">
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Primary700}, Dark={StaticResource Primary200}}" />
         <Setter Property="FontFamily" Value="OpenSansSemibold" />

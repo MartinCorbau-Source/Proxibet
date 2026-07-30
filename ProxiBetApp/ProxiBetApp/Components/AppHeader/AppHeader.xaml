@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--
-En-tête partagé des pages authentifiées : titre + bascule thème clair/sombre + icône profil.
-Shell.TitleView est par-page/par-ShellContent (pas de partage automatique entre tabs en MAUI
-Shell) ; ce composant est donc embarqué en premier enfant du layout de chaque page plutôt
-que déclaré via Shell.TitleView, pour éviter de dupliquer ce XAML par ShellContent.
+Overlay flottant par-dessus le contenu scrollable (pas une row fixe) pour laisser le contenu
+défiler derrière. Deux Brush Light/Dark séparés (pas un seul Brush avec AppThemeBinding imbriqué) :
+un Brush composite ne se partage pas proprement en StaticResource conditionnel Light/Dark.
 -->
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
@@ -14,16 +13,21 @@ que déclaré via Shell.TitleView, pour éviter de dupliquer ce XAML par ShellCo
 
     <ContentView.Resources>
         <utilities:ThemeIconConverter x:Key="ThemeIconConverter" />
+
+        <LinearGradientBrush x:Key="HeaderBackgroundGradientLight" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="{StaticResource HeaderOverlayBackground}" Offset="0.0" />
+            <GradientStop Color="{StaticResource HeaderOverlayBackgroundTransparent}" Offset="1.0" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="HeaderBackgroundGradientDark" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="{StaticResource HeaderOverlayBackgroundDark}" Offset="0.0" />
+            <GradientStop Color="{StaticResource HeaderOverlayBackgroundDarkTransparent}" Offset="1.0" />
+        </LinearGradientBrush>
     </ContentView.Resources>
 
     <Grid ColumnDefinitions="*,Auto,Auto"
           ColumnSpacing="{StaticResource size120}"
-          Padding="{StaticResource LayoutPadding}">
-
-        <Label Grid.Column="0"
-               Text="{Binding HeaderTitle, Source={x:Reference Root}}"
-               Style="{StaticResource Title2}"
-               VerticalOptions="Center" />
+          Padding="{StaticResource HeaderPadding}"
+          Background="{AppThemeBinding Light={StaticResource HeaderBackgroundGradientLight}, Dark={StaticResource HeaderBackgroundGradientDark}}">
 
         <ProxiButton Grid.Column="1"
                      Variant="Icon"

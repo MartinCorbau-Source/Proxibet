@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--
-Card paramétrable en Color (Default/Primary), HasShadow (bool) et MaxWidth (double), pour
-remplacer le style keyé CardStyle statique (Resources/Styles/Cards.xaml) par un composant qui
-peut faire varier son rendu sans multiplier les styles nommés côté page.
-
-CardContent (ObservableCollection<View>, même mécanisme que CenteredFormLayout.FormContent /
-AuthenticatedPageLayout.PageContent, voir leurs .xaml.cs) : le Border interne doit rester
-qualifié via <ContentView.Content> — sans ça, le ContentProperty capterait le Border
-lui-même au lieu du contenu de la page consommatrice (même piège documenté par ces deux
-composants).
+Border interne qualifié via <ContentView.Content> : sans ça, le ContentProperty (CardContent)
+capterait le Border lui-même au lieu du contenu de la page consommatrice.
 -->
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
