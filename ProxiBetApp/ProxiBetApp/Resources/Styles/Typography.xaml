@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- Style Label implicite unique (fusion de l'ancien Styles.xaml + AppStyles.xaml -->
+    <!-- variante retenue : AppStyles.xaml, plus complète avec LineHeight + VisualState Disabled) -->
+    <Style TargetType="Label">
+        <Setter Property="TextColor"
+                Value="{AppThemeBinding Light={StaticResource DarkOnLightBackground}, Dark={StaticResource LightOnDarkBackground}}" />
+        <Setter Property="BackgroundColor"
+                Value="Transparent" />
+        <Setter Property="FontSize"
+                Value="17" />
+        <Setter Property="LineHeight"
+                Value="1.29" />
+        <!-- 22 -->
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="Disabled">
+                        <VisualState.Setters>
+                            <Setter Property="TextColor"
+                                    Value="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}" />
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+
+    <!--
+    Headline/SubHeadline : recolorées sur l'échelle Primary (Primary700 light / Primary200
+    dark) au lieu de MidnightBlue, une couleur hors palette qui ne suivait pas le contraste
+    vérifié WCAG des autres tokens texte. FontFamily Semibold ajoutée pour un vrai poids de
+    titre (elles n'en avaient aucune, donc héritaient du Regular du Label implicite).
+    -->
+    <Style TargetType="Label" x:Key="Headline">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Primary700}, Dark={StaticResource Primary200}}" />
+        <Setter Property="FontFamily" Value="OpenSansSemibold" />
+        <Setter Property="FontSize" Value="32" />
+        <Setter Property="HorizontalOptions" Value="Center" />
+        <Setter Property="HorizontalTextAlignment" Value="Center" />
+    </Style>
+
+    <Style TargetType="Label" x:Key="SubHeadline">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Primary700}, Dark={StaticResource Primary200}}" />
+        <Setter Property="FontFamily" Value="OpenSansSemibold" />
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="HorizontalOptions" Value="Center" />
+        <Setter Property="HorizontalTextAlignment" Value="Center" />
+    </Style>
+
+    <!-- https://fluent2.microsoft.design/typography/ -->
+    <Style x:Key="Caption2"
+           TargetType="Label">
+        <Setter Property="FontSize"
+                Value="12" />
+        <Setter Property="LineHeight"
+                Value="1.33" />
+        <!-- 16 -->
+    </Style>
+    <Style x:Key="Caption1"
+           TargetType="Label">
+        <Setter Property="FontSize"
+                Value="13" />
+        <Setter Property="LineHeight"
+                Value="1.38" />
+        <!-- 18 -->
+    </Style>
+    <Style x:Key="Caption1Strong"
+           TargetType="Label">
+        <Setter Property="FontSize"
+                Value="13" />
+        <Setter Property="LineHeight"
+                Value="1.38" />
+        <!-- 18 -->
+        <Setter Property="FontFamily"
+                Value="{OnPlatform WinUI=SegoeSemibold, iOS=.SFUI-SemiBold, MacCatalyst=.SFUI-SemiBold, Default=''}" />
+        <Setter Property="FontAttributes"
+                Value="{OnPlatform Default=None, Android=Bold}" />
+    </Style>
+    <Style x:Key="Body2"
+           TargetType="Label">
+        <Setter Property="FontSize"
+                Value="15" />
+        <Setter Property="LineHeight"
+                Value="1.33" />
+        <!-- 20 -->
+    </Style>
+    <Style x:Key="Body2Strong"
+           TargetType="Label">
+        <Setter Property="FontSize"
+                Value="15" />
+        <Setter Property="LineHeight"
+                Value="1.33" />
+        <!-- 20 -->
+        <Setter Property="FontFamily"
+                Value="{OnPlatform WinUI=SegoeSemibold, iOS=.SFUI-SemiBold, MacCatalyst=.SFUI-SemiBold, Default=''}" />
+        <Setter Property="FontAttributes"
+                Value="{OnPlatform Default=None, Android=Bold}" />
+    </Style>
+    <Style x:Key="Body1"
+           TargetType="Label">
+        <Setter Property="FontSize"
+                Value="17" />
+        <Setter Property="LineHeight"
+                Value="1.29" />
+        <!-- 22 -->
+    </Style>
+    <Style x:Key="Body1Strong"
+           TargetType="Label">
+        <Setter Property="FontSize"
+                Value="17" />
+        <Setter Property="LineHeight"
+                Value="1.29" />
+        <!-- 22 -->
+        <Setter Property="FontFamily"
+                Value="{OnPlatform WinUI=SegoeSemibold, iOS=.SFUI-SemiBold, MacCatalyst=.SFUI-SemiBold, Default=''}" />
+        <Setter Property="FontAttributes"
+                Value="{OnPlatform Default=None, Android=Bold}" />
+    </Style>
+    <Style x:Key="Title3"
+           TargetType="Label">
+        <Setter Property="FontSize"
+                Value="20" />
+        <Setter Property="LineHeight"
+                Value="1.25" />
+        <!-- 25 -->
+        <Setter Property="FontFamily"
+                Value="{OnPlatform WinUI=SegoeSemibold, iOS=.SFUI-SemiBold, MacCatalyst=.SFUI-SemiBold, Default=''}" />
+        <Setter Property="FontAttributes"
+                Value="{OnPlatform Default=None, Android=Bold}" />
+    </Style>
+    <Style x:Key="Title2"
+           TargetType="Label">
+        <Setter Property="FontSize"
+                Value="22" />
+        <Setter Property="LineHeight"
+                Value="1.27" />
+        <!-- 28 -->
+        <Setter Property="FontFamily"
+                Value="{OnPlatform WinUI=SegoeSemibold, iOS=.SFUI-SemiBold, MacCatalyst=.SFUI-SemiBold, Default=''}" />
+        <Setter Property="FontAttributes"
+                Value="{OnPlatform Android=Bold, Default=None}" />
+    </Style>
+    <Style x:Key="Title1"
+           TargetType="Label">
+        <Setter Property="FontSize"
+                Value="28" />
+        <Setter Property="LineHeight"
+                Value="1.21" />
+        <!-- 34 -->
+        <Setter Property="FontAttributes"
+                Value="{OnPlatform WinUI=None, Default=Bold}" />
+    </Style>
+    <Style x:Key="LargeTitle"
+           TargetType="Label">
+        <Setter Property="FontSize"
+                Value="34" />
+        <Setter Property="LineHeight"
+                Value="1.21" />
+        <!-- 41 -->
+        <Setter Property="FontAttributes"
+                Value="{OnPlatform WinUI=None, Default=Bold}" />
+    </Style>
+    <Style x:Key="Display"
+           TargetType="Label">
+        <Setter Property="FontSize"
+                Value="60" />
+        <Setter Property="LineHeight"
+                Value="1.17" />
+        <!-- 70 -->
+        <Setter Property="FontAttributes"
+                Value="{OnPlatform WinUI=None, Default=Bold}" />
+    </Style>
+
+</ResourceDictionary>

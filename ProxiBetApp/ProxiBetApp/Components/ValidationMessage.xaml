@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+Message d'erreur réutilisable : remplace le TextColor="Red" dupliqué dans Login/Register/Me.
+Utilise les tokens Error/ErrorDark (Colors.xaml) au lieu d'une couleur en dur, et se masque
+automatiquement quand Text est vide (pas besoin de gérer IsVisible côté page appelante).
+-->
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ProxiBetApp.Components.ValidationMessage"
+             x:Name="Root">
+
+    <Label x:Name="MessageLabel"
+           Style="{StaticResource Caption1}"
+           TextColor="{AppThemeBinding Light={StaticResource Error}, Dark={StaticResource ErrorDark}}" />
+
+</ContentView>

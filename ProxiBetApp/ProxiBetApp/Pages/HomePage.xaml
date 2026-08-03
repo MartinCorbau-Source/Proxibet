@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="ProxiBetApp.Pages.HomePage"
+             x:Name="HomeRoot"
+             x:DataType="HomePageModel"
+             Shell.NavBarIsVisible="False"
+             Title="Accueil">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior
+            BindingContext="{Binding Path=BindingContext, Source={x:Reference HomeRoot}, x:DataType=ContentPage}"
+            EventName="Appearing"
+            Command="{Binding AppearingCommand}" />
+    </ContentPage.Behaviors>
+
+    <AuthenticatedPageLayout HeaderTitle="Accueil"
+                             ProfileCommand="{Binding GoToProfileCommand}"
+                             IsDarkMode="{Binding IsDarkMode}"
+                             ToggleThemeCommand="{Binding ToggleThemeCommand}">
+
+        <VerticalStackLayout Padding="{StaticResource LayoutPadding}" Spacing="{StaticResource FormSpacing}">
+
+            <Label Style="{StaticResource Title1}"
+                   Text="{Binding User.DisplayName, StringFormat='Bienvenue, {0} !'}" />
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+
+            <ValidationMessage Text="{Binding ErrorMessage}" />
+
+            <Button Text="[Debug] Component Gallery"
+                    Command="{Binding GoToDevGalleryCommand}"
+                    Style="{StaticResource SecondaryButtonStyle}"
+                    IsVisible="{Binding IsDevGalleryButtonVisible}" />
+
+        </VerticalStackLayout>
+
+    </AuthenticatedPageLayout>
+</ContentPage>

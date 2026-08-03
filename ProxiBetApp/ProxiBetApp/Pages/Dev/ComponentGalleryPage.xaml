@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+Page de développement uniquement (route enregistrée en #if DEBUG dans AppShell.xaml.cs,
+jamais accessible en Release). Sert de banc de test visuel pour vérifier l'effet d'un
+changement de token (couleur, spacing, rayon...) sur tous les composants sans naviguer
+dans Login/Register/Me.
+-->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ProxiBetApp.Pages.Dev.ComponentGalleryPage"
+             xmlns:dev="clr-namespace:ProxiBetApp.Pages.Dev"
+             x:DataType="dev:ComponentGalleryPageModel"
+             Shell.NavBarIsVisible="False"
+             Title="Component Gallery">
+
+    <AuthenticatedPageLayout HeaderTitle="Component Gallery"
+                             ProfileCommand="{Binding NoOpCommand}"
+                             IsDarkMode="{Binding IsDarkMode}"
+                             ToggleThemeCommand="{Binding ToggleThemeCommand}">
+
+        <VerticalStackLayout Padding="{StaticResource LayoutPadding}" Spacing="{StaticResource size320}">
+
+            <Label Style="{StaticResource Title1}" Text="Component Gallery" />
+
+            <!-- Typography -->
+            <Label Style="{StaticResource Title2}" Text="Typography" />
+            <Label Style="{StaticResource LargeTitle}" Text="LargeTitle" />
+            <Label Style="{StaticResource Title1}" Text="Title1" />
+            <Label Style="{StaticResource Body1}" Text="Body1" />
+            <Label Style="{StaticResource Caption1}" Text="Caption1" />
+
+            <!-- Buttons -->
+            <Label Style="{StaticResource Title2}" Text="Buttons" />
+            <Button Text="Bouton primaire" />
+            <Button Text="Bouton primaire désactivé" IsEnabled="False" />
+            <Button Text="Bouton secondaire" Style="{StaticResource SecondaryButtonStyle}" />
+
+            <!-- ValidationMessage -->
+            <Label Style="{StaticResource Title2}" Text="ValidationMessage" />
+            <ValidationMessage Text="Ce champ est requis" />
+            <Label Style="{StaticResource Caption1}" Text="(instance avec Text vide ci-dessous : ne prend pas de place)" />
+            <ValidationMessage Text="" />
+
+            <!-- FormField -->
+            <Label Style="{StaticResource Title2}" Text="FormField" />
+            <Label Style="{StaticResource Caption1}" Text="État repos (tap dans le champ ci-dessous pour voir l'état focus)" />
+            <FormField FieldLabel="Email" Placeholder="vous@exemple.com" Keyboard="Email" />
+            <Label Style="{StaticResource Caption1}" Text="État erreur" />
+            <FormField FieldLabel="Mot de passe" Placeholder="Mot de passe" IsPassword="True" ErrorMessage="Mot de passe trop court" />
+
+            <!-- Card -->
+            <Label Style="{StaticResource Title2}" Text="Card" />
+            <Border Style="{StaticResource CardStyle}">
+                <VerticalStackLayout Spacing="{StaticResource size80}">
+                    <Label Text="Titre de carte" Style="{StaticResource Caption1}" />
+                    <Label Text="Contenu de carte" Style="{StaticResource Body1Strong}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- CenteredFormLayout -->
+            <Label Style="{StaticResource Title2}" Text="CenteredFormLayout" />
+            <Border Style="{StaticResource CardStyle}">
+                <CenteredFormLayout>
+                    <Label Style="{StaticResource Title1}" Text="Exemple de formulaire" HorizontalOptions="Center" />
+                    <FormField FieldLabel="Email" Placeholder="vous@exemple.com" Keyboard="Email" />
+                    <Button Text="Valider" />
+                </CenteredFormLayout>
+            </Border>
+
+        </VerticalStackLayout>
+
+    </AuthenticatedPageLayout>
+</ContentPage>

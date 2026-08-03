@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="ProxiBetApp.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:ProxiBetApp.Pages"
+    Shell.FlyoutBehavior="Disabled"
+    Title="ProxiBetApp">
+
+    <ShellContent
+        Title="Login"
+        ContentTemplate="{DataTemplate pages:LoginPage}"
+        Route="login" />
+
+    <!--
+    Pas de TabBar Shell natif : sur Windows, le renderer WinUI n'affiche aucune tab bar
+    visible avec un seul ShellContent (contrairement à Android/iOS). La navigation entre
+    sections authentifiées est assurée par Components/BottomNavBar, embarqué dans chaque
+    page, pour un rendu identique sur toutes les plateformes.
+    -->
+    <ShellContent
+        Title="Accueil"
+        ContentTemplate="{DataTemplate pages:HomePage}"
+        Route="home" />
+
+</Shell>

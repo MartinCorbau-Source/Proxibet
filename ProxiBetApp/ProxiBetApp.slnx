@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ProxiBetApp/ProxiBetApp.csproj" />
+  <Project Path="ProxiBetApp.Tests/ProxiBetApp.Tests.csproj" />
+</Solution>

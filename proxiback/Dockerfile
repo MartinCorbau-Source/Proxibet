@@ -1,18 +1,5 @@
 # syntax=docker/dockerfile:1
 
-FROM node:24-alpine AS frontend-builder
-
-WORKDIR /src/proxifront
-
-COPY proxifront/package*.json ./
-
-RUN npm ci
-
-COPY proxifront/ ./
-
-RUN npm run build -- --output-path=/out/proxifront \
-    && test -f /out/proxifront/browser/index.html
-
 FROM golang:1.26-alpine AS backend-builder
 
 WORKDIR /src/proxiback
@@ -37,10 +24,7 @@ RUN apk add --no-cache ca-certificates \
 
 WORKDIR /app
 
-ENV STATIC_DIR=/app/public
-
 COPY --from=backend-builder /out/proxibet-api /app/proxibet-api
-COPY --from=frontend-builder /out/proxifront/browser /app/public
 
 USER proxibet
 

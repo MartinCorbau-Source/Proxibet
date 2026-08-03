@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+Barre de navigation custom, fixe en bas des pages authentifiées. Remplace le TabBar Shell
+natif : sur Windows, le renderer Shell WinUI n'affiche aucune tab bar visible tant qu'il n'y
+a qu'un seul ShellContent dans le TabBar (contrairement à Android/iOS) — inadapté tant que
+l'app n'a qu'une seule section "Accueil". Ce composant garantit un rendu identique sur
+toutes les plateformes, y compris avec un seul item, et reste simple à étendre (ajouter un
+item = dupliquer une colonne + un Button ci-dessous) sans dépendre du nombre d'onglets Shell.
+-->
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:fonts="clr-namespace:Fonts"
+             x:Class="ProxiBetApp.Components.BottomNavBar"
+             x:Name="Root">
+
+    <Grid ColumnDefinitions="*"
+          BackgroundColor="{AppThemeBinding Light={StaticResource LightSecondaryBackground}, Dark={StaticResource DarkSecondaryBackground}}"
+          Padding="{StaticResource size80}">
+
+        <Button Grid.Column="0"
+                Style="{StaticResource SecondaryButtonStyle}"
+                Command="{Binding GoToHomeCommand, Source={x:Reference Root}}"
+                Text="Accueil"
+                ContentLayout="Top,4"
+                FontFamily="OpenSansRegular">
+            <Button.ImageSource>
+                <FontImageSource FontFamily="FluentUI"
+                                 Glyph="{x:Static fonts:FluentUI.home_24_regular}"
+                                 Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+            </Button.ImageSource>
+        </Button>
+
+    </Grid>
+
+</ContentView>
