@@ -36,4 +36,8 @@
         <Setter Property="Background" Value="{AppThemeBinding Light={StaticResource Primary50}, Dark={StaticResource Primary900}}"/>
     </Style>
 
+    <Style TargetType="Border" x:Key="CardSecondaryStyle" BasedOn="{StaticResource CardStyle}">
+        <Setter Property="Background" Value="{AppThemeBinding Light={StaticResource Secondary50}, Dark={StaticResource Secondary900}}"/>
+    </Style>
+
 </ResourceDictionary>

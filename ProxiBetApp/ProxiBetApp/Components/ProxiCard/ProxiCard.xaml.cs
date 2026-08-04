@@ -93,7 +93,7 @@ namespace ProxiBetApp.Components
             }
         }
 
-        // Résout Color vers CardStyle/CardPrimaryStyle (Resources/Styles/Cards.xaml), qui
+        // Résout Color vers CardStyle/CardPrimaryStyle/CardSecondaryStyle (Resources/Styles/Cards.xaml), qui
         // portent déjà StrokeShape/Padding/Background/Shadow. HasShadow=false retire le Shadow
         // posé par le style plutôt que de le reconstruire : pas besoin de détecter le thème
         // actif en code-behind, l'AppThemeBinding du Style suffit tant qu'on ne fait que le
@@ -103,6 +103,7 @@ namespace ProxiBetApp.Components
             var styleKey = Color switch
             {
                 CardColor.Primary => "CardPrimaryStyle",
+                CardColor.Secondary => "CardSecondaryStyle",
                 _ => "CardStyle"
             };
 

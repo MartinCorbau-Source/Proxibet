@@ -9,7 +9,7 @@ namespace ProxiBetApp.Components
 
     public enum ButtonRadius
     {
-        Full,
+        Default,
         Medium,
         Small
     }

@@ -31,7 +31,7 @@ namespace ProxiBetApp.Components
             nameof(Radius),
             typeof(ButtonRadius),
             typeof(ProxiButton),
-            ButtonRadius.Full,
+            ButtonRadius.Default,
             propertyChanged: OnStyleAffectingPropertyChanged);
 
         public static readonly BindableProperty FontFamilyProperty = BindableProperty.Create(
@@ -156,10 +156,10 @@ namespace ProxiBetApp.Components
         {
             var styleKey = (Variant, Radius) switch
             {
-                (ButtonVariant.Primary, ButtonRadius.Full) => "PrimaryButtonStyle",
+                (ButtonVariant.Primary, ButtonRadius.Default) => "PrimaryButtonStyle",
                 (ButtonVariant.Primary, ButtonRadius.Medium) => "ButtonRoundedStyle",
                 (ButtonVariant.Primary, ButtonRadius.Small) => "ButtonSquareStyle",
-                (ButtonVariant.Secondary, ButtonRadius.Full) => "SecondaryButtonStyle",
+                (ButtonVariant.Secondary, ButtonRadius.Default) => "SecondaryButtonStyle",
                 (ButtonVariant.Secondary, ButtonRadius.Medium) => "SecondaryButtonRoundedStyle",
                 (ButtonVariant.Secondary, ButtonRadius.Small) => "SecondaryButtonSquareStyle",
                 (ButtonVariant.Icon, _) => "IconButtonStyle",
