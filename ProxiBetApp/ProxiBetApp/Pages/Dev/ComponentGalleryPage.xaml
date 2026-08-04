@@ -18,14 +18,39 @@
             <Label Style="{StaticResource Body1}" Text="Body1" />
             <Label Style="{StaticResource Caption1}" Text="Caption1" />
 
+            <Label Style="{StaticResource Title2}" Text="Couleurs — exemples réutilisables" />
+
+            <Label Style="{StaticResource Caption1}" Text="Header dégradé (GradientHero) — à réutiliser pour un hero de page" />
+            <Border StrokeThickness="0" Background="{StaticResource GradientHero}" Padding="{StaticResource size240}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="{StaticResource CornerRadiusLarge}" />
+                </Border.StrokeShape>
+                <Label Text="Match du soir" Style="{StaticResource Title2}" TextColor="{StaticResource White}" />
+            </Border>
+
+            <Label Style="{StaticResource Caption1}" Text="Badge highlight (GradientSoft) — à réutiliser pour un statut/succès" />
+            <Border StrokeThickness="0" Background="{StaticResource GradientSoft}" Padding="16,8" HorizontalOptions="Start">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="{StaticResource CornerRadiusFull}" />
+                </Border.StrokeShape>
+                <Label Text="🔥 Streak x4" Style="{StaticResource Caption1Strong}" />
+            </Border>
+
+            <Label Style="{StaticResource Caption1}" Text="Card succès (Secondary50/900) — à réutiliser pour un état positif" />
+            <Border Style="{StaticResource CardStyle}" Background="{AppThemeBinding Light={StaticResource Secondary50}, Dark={StaticResource Secondary900}}">
+                <VerticalStackLayout Spacing="{StaticResource size80}">
+                    <Label Text="Pari gagné" Style="{StaticResource Caption1}" />
+                    <Label Text="Tu as gagné 2 bières 🍺" Style="{StaticResource Body1Strong}" />
+                </VerticalStackLayout>
+            </Border>
+
             <Label Style="{StaticResource Title2}" Text="Buttons — texte simple" />
-            <ProxiButton Text="ProxiButton Primary/Full" Variant="Primary" Radius="Full" />
-            <ProxiButton Text="ProxiButton Primary/Medium" Variant="Primary" Radius="Medium" />
+            <!-- Radius="Default" et "Medium" rendent pareil depuis le retrait de la pilule (les deux résolvent vers ButtonCornerRadiusMedium) : un seul exemple par variante couleur suffit, Small reste le seul rayon visuellement distinct. -->
+            <ProxiButton Text="ProxiButton Primary" Variant="Primary" />
             <ProxiButton Text="ProxiButton Primary/Small" Variant="Primary" Radius="Small" />
-            <ProxiButton Text="ProxiButton Secondary/Full" Variant="Secondary" Radius="Full" />
-            <ProxiButton Text="ProxiButton Secondary/Medium" Variant="Secondary" Radius="Medium" />
+            <ProxiButton Text="ProxiButton Secondary" Variant="Secondary" />
             <ProxiButton Text="ProxiButton Secondary/Small" Variant="Secondary" Radius="Small" />
-            <ProxiButton Text="ProxiButton désactivé" Variant="Primary" Radius="Full" IsEnabled="False" />
+            <ProxiButton Text="ProxiButton désactivé" Variant="Primary" IsEnabled="False" />
 
             <Label Style="{StaticResource Title2}" Text="Buttons — icône seule (Variant=Icon)" />
             <ProxiButton Variant="Icon"
@@ -82,6 +107,14 @@
 
             <Label Style="{StaticResource Caption1}" Text="Color=&quot;Primary&quot; (fond teinté marque)" />
             <ProxiCard Color="Primary">
+                <VerticalStackLayout Spacing="{StaticResource size80}">
+                    <Label Text="Titre de carte" Style="{StaticResource Caption1}" />
+                    <Label Text="Contenu de carte" Style="{StaticResource Body1Strong}" />
+                </VerticalStackLayout>
+            </ProxiCard>
+
+            <Label Style="{StaticResource Caption1}" Text="Color=&quot;Secondary&quot; (fond teinté vert menthe, statut/résultat)" />
+            <ProxiCard Color="Secondary">
                 <VerticalStackLayout Spacing="{StaticResource size80}">
                     <Label Text="Titre de carte" Style="{StaticResource Caption1}" />
                     <Label Text="Contenu de carte" Style="{StaticResource Body1Strong}" />
