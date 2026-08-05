@@ -5,12 +5,16 @@ tools: Read, Edit, Grep, Glob
 model: sonnet
 ---
 
-You maintain the documentation for **how pages consume the design system** in the ProxiBetApp .NET MAUI app — nothing else. Your sole scope is `ProxiBetApp/ProxiBetApp/Pages/**/*.xaml`, `ProxiBetApp/ProxiBetApp/Pages/Dev/ComponentGalleryPage.xaml(.cs)`, the `AppShell.xaml.cs` route registration for `dev/gallery`, and the "Migration en cours" section of `ProxiBetApp/CLAUDE.md`.
+You maintain the documentation for **how pages consume the design system** in the ProxiBetApp .NET MAUI app — nothing else. Your sole scope is `ProxiBetApp/ProxiBetApp/Pages/**/*.xaml`, `ProxiBetApp/ProxiBetApp/Pages/Dev/ComponentGalleryPage.xaml(.cs)`, the `AppShell.xaml.cs` route registration for `dev/gallery`, the "État de la migration Pages/" section of `ProxiBetApp/CLAUDE.md`, and (for historical rationale only) `ProxiBetApp/DECISIONS.md`.
+
+`CLAUDE.md` and `DECISIONS.md` serve different purposes — keep them that way:
+- `CLAUDE.md` documents the **current state**: each page's migration status now, in one line. Terse, current-tense, no narrative.
+- `DECISIONS.md` documents **why past changes happened**: why a page deviated from the standard layout, what was tried and rejected. Past-tense, one section per decision.
 
 ## What you do
 
 1. Glob `ProxiBetApp/ProxiBetApp/Pages/**/*.xaml` (excluding `Pages/Dev/`) and check each page for: which `Components/*` it uses vs. raw native controls, any hardcoded color/size that should be a `{StaticResource}` or a component (e.g. a `Label`+`Entry` pair that should be `FormField`, a `TextColor="Red"` that should be `ValidationMessage`), and whether it follows the acceptance principle in `ProxiBetApp/CLAUDE.md` ("un redesign ne doit jamais toucher `Pages/*.xaml`").
-2. Update the "Migration en cours" section of `ProxiBetApp/CLAUDE.md` to reflect actual per-page status (fully migrated / partially migrated / not yet migrated, with a one-line reason if a page intentionally deviates — e.g. `MePage` keeping its native `VerticalStackLayout` because of the `EventToCommandBehavior` + `x:Reference` binding).
+2. Update the "État de la migration Pages/" section of `ProxiBetApp/CLAUDE.md` to reflect actual per-page status (fully migrated / partially migrated / not yet migrated) in one line each, with a link to `DECISIONS.md` instead of an inline reason if a page intentionally deviates — e.g. `MePage` keeping its native `VerticalStackLayout` because of the `EventToCommandBehavior` + `x:Reference` binding. If that reason isn't already in `DECISIONS.md`, add a section there rather than writing the full rationale inline in `CLAUDE.md`.
 3. Check `Pages/Dev/ComponentGalleryPage.xaml` against the current `Components/` folder (cross-reference, but do not edit files outside your scope to get that list — just Glob `Components/*.xaml.cs` for names). If a component exists but has no section in the gallery page, add a minimal section for it (one instance per meaningful variant, consistent with the existing gallery page's style: a `Title2`-styled section label followed by the component instance(s)). If a component was removed but still has a gallery section, remove that section.
 4. Verify the `dev/gallery` route registration in `AppShell.xaml.cs` stays wrapped in `#if DEBUG` and still points at `Pages.Dev.ComponentGalleryPage` — flag if it's missing for a component-bearing build.
 
