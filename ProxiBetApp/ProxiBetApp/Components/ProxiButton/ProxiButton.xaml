@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+Variant+Radius résolus en code-behind (UpdateStyle) vers l'un des styles de Buttons.xaml.
+FontSize/Padding ne sont pas bindés en XAML direct : appliqués seulement en code-behind pour ne
+pas écraser le style résolu quand ils ne sont pas explicitement fournis.
+-->
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ProxiBetApp.Components.ProxiButton"
+             x:Name="Root">
+
+    <Button x:Name="InnerButton"
+            Text="{Binding Text, Source={x:Reference Root}}"
+            Command="{Binding Command, Source={x:Reference Root}}"
+            CommandParameter="{Binding CommandParameter, Source={x:Reference Root}}"
+            IsEnabled="{Binding IsEnabled, Source={x:Reference Root}}"
+            FontFamily="{Binding FontFamily, Source={x:Reference Root}}"
+            ImageSource="{Binding ImageSource, Source={x:Reference Root}}"
+            ContentLayout="{Binding ContentLayout, Source={x:Reference Root}}" />
+
+</ContentView>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+Overlay flottant par-dessus le contenu scrollable (pas une row fixe) pour laisser le contenu
+défiler derrière. Deux Brush Light/Dark séparés (pas un seul Brush avec AppThemeBinding imbriqué) :
+un Brush composite ne se partage pas proprement en StaticResource conditionnel Light/Dark.
+-->
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ProxiBetApp.Components.AppHeader"
+             x:Name="Root">
+
+    <ContentView.Resources>
+        <LinearGradientBrush x:Key="HeaderBackgroundGradientLight" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="{StaticResource HeaderOverlayBackground}" Offset="0.0" />
+            <GradientStop Color="{StaticResource HeaderOverlayBackgroundTransparent}" Offset="1.0" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="HeaderBackgroundGradientDark" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="{StaticResource HeaderOverlayBackgroundDark}" Offset="0.0" />
+            <GradientStop Color="{StaticResource HeaderOverlayBackgroundDarkTransparent}" Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentView.Resources>
+
+    <Grid ColumnDefinitions="*,Auto"
+          ColumnSpacing="{StaticResource size120}"
+          Padding="{StaticResource HeaderPadding}"
+          Background="{AppThemeBinding Light={StaticResource HeaderBackgroundGradientLight}, Dark={StaticResource HeaderBackgroundGradientDark}}">
+    </Grid>
+
+</ContentView>

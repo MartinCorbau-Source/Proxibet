@@ -20,6 +20,7 @@
     <x:Double x:Key="size480">48</x:Double>
     <x:Double x:Key="size520">52</x:Double>
     <x:Double x:Key="size560">56</x:Double>
+    <x:Double x:Key="size640">64</x:Double>
 
     <!-- https://fluent2.microsoft.design/typography/ -->
     <OnIdiom x:Key="IconSize"
@@ -36,8 +37,8 @@
 
     <OnIdiom x:Key="LayoutPadding"
              x:TypeArguments="Thickness"
-             Default="15">
-        <OnIdiom.Desktop>30</OnIdiom.Desktop>
+             Default="5">
+        <OnIdiom.Desktop>5</OnIdiom.Desktop>
     </OnIdiom>
 
     <OnIdiom x:Key="LayoutSpacing"
@@ -46,12 +47,31 @@
         <OnIdiom.Desktop>15</OnIdiom.Desktop>
     </OnIdiom>
 
-    <!-- Largeur max des formulaires (Login/Register/Me), extraite du MaximumWidthRequest -->
-    <!-- dupliqué en dur dans les 3 pages -->
-    <x:Double x:Key="FormMaxWidth">480</x:Double>
+    <OnIdiom x:Key="InputFontSize"
+             x:TypeArguments="x:Double"
+             Default="15">
+        <OnIdiom.Desktop>16</OnIdiom.Desktop>
+    </OnIdiom>
 
-    <!-- Spacing entre les éléments d'un formulaire (Login/Register/Me), extrait du -->
-    <!-- Spacing="15" dupliqué en dur dans les 3 pages -->
+    <x:Double x:Key="FormMaxWidth">480</x:Double>
     <x:Double x:Key="FormSpacing">15</x:Double>
+
+    <x:Double x:Key="IconButtonMinSize">36</x:Double>
+
+    <x:Double x:Key="MinTapTarget">44</x:Double>
+
+    <!-- Vertical réduit vs LayoutPadding : un vertical calqué sur LayoutPadding rendait le bandeau overlay trop haut. -->
+    <OnIdiom x:Key="HeaderPadding"
+             x:TypeArguments="Thickness"
+             Default="15,8">
+        <OnIdiom.Desktop>30,12</OnIdiom.Desktop>
+    </OnIdiom>
+
+    <!-- Compense la hauteur réelle du header flottant, à ajuster si AppHeader change de hauteur. -->
+    <OnIdiom x:Key="HeaderOverlayContentPadding"
+             x:TypeArguments="Thickness"
+             Default="0,0,0,0">
+        <OnIdiom.Desktop>0,0,0,0</OnIdiom.Desktop>
+    </OnIdiom>
 
 </ResourceDictionary>

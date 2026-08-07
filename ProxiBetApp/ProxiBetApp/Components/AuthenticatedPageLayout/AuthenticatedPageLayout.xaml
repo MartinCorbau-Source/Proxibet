@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+AppHeader et le ScrollView de contenu partagent Grid.Row="0" (superposés, AppHeader en ZIndex="1")
+pour que le contenu défile derrière le header flottant. InnerLayout compense la hauteur du header
+via HeaderOverlayContentPadding, à ajuster si AppHeader change de hauteur.
+Shell.NavBarIsVisible="False" reste à déclarer sur la ContentPage hôte (propriété attachée Shell,
+non positionnable par un ContentView enfant).
+-->
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ProxiBetApp.Components.AuthenticatedPageLayout"
+             x:Name="Root">
+
+    <ContentView.Content>
+        <Grid>
+
+            <ScrollView>
+                <VerticalStackLayout x:Name="InnerLayout" Padding="{StaticResource HeaderOverlayContentPadding}" />
+            </ScrollView>
+
+            <AppHeader VerticalOptions="Start"
+                       ZIndex="1" />
+
+        </Grid>
+    </ContentView.Content>
+
+</ContentView>

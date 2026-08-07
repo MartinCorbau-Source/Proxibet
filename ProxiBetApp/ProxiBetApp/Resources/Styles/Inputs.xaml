@@ -3,21 +3,15 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <!--
-    Entry implicite volontairement minimal : le conteneur visuel (Border outlined, radius,
-    stroke qui réagit au focus/erreur) vit dans le composant FormField, pas ici — un Entry
-    utilisé hors FormField (rare) reste sobre plutôt que d'imposer un cadre non désiré.
-    PlaceholderColor recalé sur Gray400/Gray400 (Gray200 était presque invisible sur fond
-    clair, contraste insuffisant) pour rester lisible en état repos.
-    -->
+    <!-- Conteneur visuel (Border outlined, focus/erreur) vit dans FormField, pas ici. -->
     <Style TargetType="Entry">
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource DarkOnLightBackground}, Dark={StaticResource LightOnDarkBackground}}" />
         <Setter Property="BackgroundColor" Value="Transparent" />
         <Setter Property="FontFamily" Value="OpenSansRegular"/>
-        <Setter Property="FontSize" Value="{OnIdiom 18, Desktop=24}" />
+        <Setter Property="FontSize" Value="{StaticResource InputFontSize}" />
         <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray400}}" />
-        <Setter Property="MinimumHeightRequest" Value="44"/>
-        <Setter Property="MinimumWidthRequest" Value="44"/>
+        <Setter Property="MinimumHeightRequest" Value="{StaticResource size400}"/>
+        <Setter Property="MinimumWidthRequest" Value="{StaticResource size400}"/>
         <Setter Property="VisualStateManager.VisualStateGroups">
             <VisualStateGroupList>
                 <VisualStateGroup x:Name="CommonStates">
@@ -59,9 +53,9 @@
         <Setter Property="TitleColor" Value="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray200}}" />
         <Setter Property="BackgroundColor" Value="Transparent" />
         <Setter Property="FontFamily" Value="OpenSansRegular"/>
-        <Setter Property="FontSize" Value="{OnIdiom 18, Desktop=24}" />
-        <Setter Property="MinimumHeightRequest" Value="44"/>
-        <Setter Property="MinimumWidthRequest" Value="44"/>
+        <Setter Property="FontSize" Value="{StaticResource InputFontSize}" />
+        <Setter Property="MinimumHeightRequest" Value="{StaticResource size400}"/>
+        <Setter Property="MinimumWidthRequest" Value="{StaticResource size400}"/>
         <Setter Property="VisualStateManager.VisualStateGroups">
             <VisualStateGroupList>
                 <VisualStateGroup x:Name="CommonStates">

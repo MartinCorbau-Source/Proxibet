@@ -15,10 +15,7 @@
             Command="{Binding AppearingCommand}" />
     </ContentPage.Behaviors>
 
-    <AuthenticatedPageLayout HeaderTitle="Accueil"
-                             ProfileCommand="{Binding GoToProfileCommand}"
-                             IsDarkMode="{Binding IsDarkMode}"
-                             ToggleThemeCommand="{Binding ToggleThemeCommand}">
+    <AuthenticatedPageLayout>
 
         <VerticalStackLayout Padding="{StaticResource LayoutPadding}" Spacing="{StaticResource FormSpacing}">
 
@@ -29,10 +26,20 @@
 
             <ValidationMessage Text="{Binding ErrorMessage}" />
 
-            <Button Text="[Debug] Component Gallery"
-                    Command="{Binding GoToDevGalleryCommand}"
-                    Style="{StaticResource SecondaryButtonStyle}"
-                    IsVisible="{Binding IsDevGalleryButtonVisible}" />
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource size160}">
+                <ProxiCard Grid.Column="0" Color="Primary">
+                    <VerticalStackLayout Spacing="{StaticResource size80}">
+                        <Label Text="Paris actifs" Style="{StaticResource Caption1}" />
+                        <Label Text="3" Style="{StaticResource Title1}" />
+                    </VerticalStackLayout>
+                </ProxiCard>
+                <ProxiCard Grid.Column="1" Color="Secondary">
+                    <VerticalStackLayout Spacing="{StaticResource size80}">
+                        <Label Text="Streak" Style="{StaticResource Caption1}" />
+                        <Label Text="🔥 x4" Style="{StaticResource Title1}" />
+                    </VerticalStackLayout>
+                </ProxiCard>
+            </Grid>
 
         </VerticalStackLayout>
 

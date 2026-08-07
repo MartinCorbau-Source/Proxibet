@@ -1,71 +1,152 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!--
-Page de développement uniquement (route enregistrée en #if DEBUG dans AppShell.xaml.cs,
-jamais accessible en Release). Sert de banc de test visuel pour vérifier l'effet d'un
-changement de token (couleur, spacing, rayon...) sur tous les composants sans naviguer
-dans Login/Register/Me.
--->
+<!-- Page de dev uniquement (route #if DEBUG dans AppShell.xaml.cs). -->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ProxiBetApp.Pages.Dev.ComponentGalleryPage"
-             xmlns:dev="clr-namespace:ProxiBetApp.Pages.Dev"
-             x:DataType="dev:ComponentGalleryPageModel"
+             xmlns:fonts="clr-namespace:Fonts"
              Shell.NavBarIsVisible="False"
              Title="Component Gallery">
 
-    <AuthenticatedPageLayout HeaderTitle="Component Gallery"
-                             ProfileCommand="{Binding NoOpCommand}"
-                             IsDarkMode="{Binding IsDarkMode}"
-                             ToggleThemeCommand="{Binding ToggleThemeCommand}">
+    <AuthenticatedPageLayout>
 
         <VerticalStackLayout Padding="{StaticResource LayoutPadding}" Spacing="{StaticResource size320}">
 
-            <Label Style="{StaticResource Title1}" Text="Component Gallery" />
-
             <!-- Typography -->
-            <Label Style="{StaticResource Title2}" Text="Typography" />
-            <Label Style="{StaticResource LargeTitle}" Text="LargeTitle" />
             <Label Style="{StaticResource Title1}" Text="Title1" />
+            <Label Style="{StaticResource Title2}" Text="Title2" />
+            <Label Style="{StaticResource LargeTitle}" Text="LargeTitle" />
             <Label Style="{StaticResource Body1}" Text="Body1" />
             <Label Style="{StaticResource Caption1}" Text="Caption1" />
 
-            <!-- Buttons -->
-            <Label Style="{StaticResource Title2}" Text="Buttons" />
-            <Button Text="Bouton primaire" />
-            <Button Text="Bouton primaire désactivé" IsEnabled="False" />
-            <Button Text="Bouton secondaire" Style="{StaticResource SecondaryButtonStyle}" />
+            <Label Style="{StaticResource Title2}" Text="Couleurs — exemples réutilisables" />
 
-            <!-- ValidationMessage -->
+            <Label Style="{StaticResource Caption1}" Text="Header dégradé (GradientHero) — à réutiliser pour un hero de page" />
+            <Border StrokeThickness="0" Background="{StaticResource GradientHero}" Padding="{StaticResource size240}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="{StaticResource CornerRadiusLarge}" />
+                </Border.StrokeShape>
+                <Label Text="Match du soir" Style="{StaticResource Title2}" TextColor="{StaticResource White}" />
+            </Border>
+
+            <Label Style="{StaticResource Caption1}" Text="Badge highlight (GradientSoft) — à réutiliser pour un statut/succès" />
+            <Border StrokeThickness="0" Background="{StaticResource GradientSoft}" Padding="16,8" HorizontalOptions="Start">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="{StaticResource CornerRadiusFull}" />
+                </Border.StrokeShape>
+                <Label Text="🔥 Streak x4" Style="{StaticResource Caption1Strong}" />
+            </Border>
+
+            <Label Style="{StaticResource Caption1}" Text="Card succès (Secondary50/900) — à réutiliser pour un état positif" />
+            <Border Style="{StaticResource CardStyle}" Background="{AppThemeBinding Light={StaticResource Secondary50}, Dark={StaticResource Secondary900}}">
+                <VerticalStackLayout Spacing="{StaticResource size80}">
+                    <Label Text="Pari gagné" Style="{StaticResource Caption1}" />
+                    <Label Text="Tu as gagné 2 bières 🍺" Style="{StaticResource Body1Strong}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Style="{StaticResource Title2}" Text="Buttons — texte simple" />
+            <!-- Radius="Default" et "Medium" rendent pareil depuis le retrait de la pilule (les deux résolvent vers ButtonCornerRadiusMedium) : un seul exemple par variante couleur suffit, Small reste le seul rayon visuellement distinct. -->
+            <ProxiButton Text="ProxiButton Primary" Variant="Primary" />
+            <ProxiButton Text="ProxiButton Primary/Small" Variant="Primary" Radius="Small" />
+            <ProxiButton Text="ProxiButton Secondary" Variant="Secondary" />
+            <ProxiButton Text="ProxiButton Secondary/Small" Variant="Secondary" Radius="Small" />
+            <ProxiButton Text="ProxiButton désactivé" Variant="Primary" IsEnabled="False" />
+
+            <Label Style="{StaticResource Title2}" Text="Buttons — icône seule (Variant=Icon)" />
+            <ProxiButton Variant="Icon"
+                         Text="{x:Static fonts:FluentUI.person_circle_24_regular}"
+                         FontFamily="FluentUI"
+                         FontSize="{StaticResource IconSize}" />
+
+            <Label Style="{StaticResource Title2}" Text="Buttons — icône + texte (Variant=Icon)" />
+            <ProxiButton Variant="Icon"
+                         Text="Accueil"
+                         ContentLayout="Top,4"
+                         FontFamily="OpenSansRegular">
+                <ProxiButton.ImageSource>
+                    <FontImageSource FontFamily="FluentUI"
+                                     Glyph="{x:Static fonts:FluentUI.home_24_regular}"
+                                     Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+                </ProxiButton.ImageSource>
+            </ProxiButton>
+
             <Label Style="{StaticResource Title2}" Text="ValidationMessage" />
             <ValidationMessage Text="Ce champ est requis" />
             <Label Style="{StaticResource Caption1}" Text="(instance avec Text vide ci-dessous : ne prend pas de place)" />
             <ValidationMessage Text="" />
 
-            <!-- FormField -->
             <Label Style="{StaticResource Title2}" Text="FormField" />
             <Label Style="{StaticResource Caption1}" Text="État repos (tap dans le champ ci-dessous pour voir l'état focus)" />
             <FormField FieldLabel="Email" Placeholder="vous@exemple.com" Keyboard="Email" />
             <Label Style="{StaticResource Caption1}" Text="État erreur" />
             <FormField FieldLabel="Mot de passe" Placeholder="Mot de passe" IsPassword="True" ErrorMessage="Mot de passe trop court" />
 
-            <!-- Card -->
+            <!-- RadioButton : contrôle natif stylé dans Controls.xaml, non encapsulé dans un composant custom. -->
+            <Label Style="{StaticResource Title2}" Text="RadioButton" />
+            <RadioButton Content="Option 1" GroupName="GalleryRadioDemo" IsChecked="True" />
+            <RadioButton Content="Option 2" GroupName="GalleryRadioDemo" />
+            <RadioButton Content="Option 3 (désactivée)" GroupName="GalleryRadioDemo" IsEnabled="False" />
+
+            <!-- CheckBox : contrôle natif stylé dans Controls.xaml. -->
+            <Label Style="{StaticResource Title2}" Text="CheckBox" />
+            <CheckBox IsChecked="True" />
+            <Label Style="{StaticResource Caption1}" Text="Désactivée" />
+            <CheckBox IsChecked="True" IsEnabled="False" />
+
+            <!-- Switch : contrôle natif stylé dans Controls.xaml. -->
+            <Label Style="{StaticResource Title2}" Text="Switch" />
+            <Switch IsToggled="True" />
+
             <Label Style="{StaticResource Title2}" Text="Card" />
-            <Border Style="{StaticResource CardStyle}">
+            <ProxiCard>
                 <VerticalStackLayout Spacing="{StaticResource size80}">
                     <Label Text="Titre de carte" Style="{StaticResource Caption1}" />
                     <Label Text="Contenu de carte" Style="{StaticResource Body1Strong}" />
                 </VerticalStackLayout>
-            </Border>
+            </ProxiCard>
 
-            <!-- CenteredFormLayout -->
+            <Label Style="{StaticResource Caption1}" Text="Color=&quot;Primary&quot; (fond teinté marque)" />
+            <ProxiCard Color="Primary">
+                <VerticalStackLayout Spacing="{StaticResource size80}">
+                    <Label Text="Titre de carte" Style="{StaticResource Caption1}" />
+                    <Label Text="Contenu de carte" Style="{StaticResource Body1Strong}" />
+                </VerticalStackLayout>
+            </ProxiCard>
+
+            <Label Style="{StaticResource Caption1}" Text="Color=&quot;Secondary&quot; (fond teinté vert menthe, statut/résultat)" />
+            <ProxiCard Color="Secondary">
+                <VerticalStackLayout Spacing="{StaticResource size80}">
+                    <Label Text="Titre de carte" Style="{StaticResource Caption1}" />
+                    <Label Text="Contenu de carte" Style="{StaticResource Body1Strong}" />
+                </VerticalStackLayout>
+            </ProxiCard>
+
+            <Label Style="{StaticResource Caption1}" Text="HasShadow=&quot;False&quot; (surface plate, sans élévation)" />
+            <ProxiCard HasShadow="False">
+                <VerticalStackLayout Spacing="{StaticResource size80}">
+                    <Label Text="Titre de carte" Style="{StaticResource Caption1}" />
+                    <Label Text="Contenu de carte" Style="{StaticResource Body1Strong}" />
+                </VerticalStackLayout>
+            </ProxiCard>
+
+            <!-- ActivityIndicator/ProgressBar/IndicatorView : contrôles natifs stylés dans Controls.xaml. -->
+            <Label Style="{StaticResource Title2}" Text="ActivityIndicator" />
+            <ActivityIndicator IsRunning="True" />
+
+            <Label Style="{StaticResource Title2}" Text="ProgressBar" />
+            <ProgressBar Progress="0.6" />
+
+            <Label Style="{StaticResource Title2}" Text="IndicatorView" />
+            <IndicatorView Count="4" Position="1" />
+
             <Label Style="{StaticResource Title2}" Text="CenteredFormLayout" />
-            <Border Style="{StaticResource CardStyle}">
+            <ProxiCard>
                 <CenteredFormLayout>
                     <Label Style="{StaticResource Title1}" Text="Exemple de formulaire" HorizontalOptions="Center" />
                     <FormField FieldLabel="Email" Placeholder="vous@exemple.com" Keyboard="Email" />
-                    <Button Text="Valider" />
+                    <ProxiButton Text="Valider" />
                 </CenteredFormLayout>
-            </Border>
+            </ProxiCard>
 
         </VerticalStackLayout>
 

@@ -15,28 +15,39 @@
             Command="{Binding AppearingCommand}" />
     </ContentPage.Behaviors>
 
-    <AuthenticatedPageLayout HeaderTitle="Mon profil"
-                             ShowProfileIcon="False"
-                             IsDarkMode="{Binding IsDarkMode}"
-                             ToggleThemeCommand="{Binding ToggleThemeCommand}">
+    <AuthenticatedPageLayout>
 
-        <VerticalStackLayout Padding="{StaticResource LayoutPadding}" Spacing="{StaticResource FormSpacing}" MaximumWidthRequest="{StaticResource FormMaxWidth}" HorizontalOptions="Center" VerticalOptions="Center">
+        <VerticalStackLayout Padding="{StaticResource LayoutPadding}" Spacing="{StaticResource FormSpacing}" VerticalOptions="Center">
 
             <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
 
             <ValidationMessage Text="{Binding ErrorMessage}" />
 
-            <Border Style="{StaticResource CardStyle}">
-                <VerticalStackLayout Spacing="8">
+            <ProxiCard>
+                <VerticalStackLayout Spacing="{StaticResource size80}">
                     <Label Text="Nom d'affichage" Style="{StaticResource Caption1}" />
                     <Label Text="{Binding User.DisplayName}" Style="{StaticResource Body1Strong}" />
 
                     <Label Text="Email" Style="{StaticResource Caption1}" />
                     <Label Text="{Binding User.Email}" Style="{StaticResource Body1Strong}" />
                 </VerticalStackLayout>
-            </Border>
+            </ProxiCard>
 
-            <Button Text="Se déconnecter" Command="{Binding LogoutCommand}" />
+            <ProxiCard>
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource size120}">
+                    <Label Grid.Column="0" Text="Mode sombre" Style="{StaticResource Body1Strong}" VerticalOptions="Center" />
+                    <Switch Grid.Column="1" IsToggled="{Binding IsDarkMode}" VerticalOptions="Center">
+                        <Switch.Behaviors>
+                            <toolkit:EventToCommandBehavior
+                                BindingContext="{Binding Path=BindingContext, Source={x:Reference MeRoot}, x:DataType=ContentPage}"
+                                EventName="Toggled"
+                                Command="{Binding ToggleThemeCommand}" />
+                        </Switch.Behaviors>
+                    </Switch>
+                </Grid>
+            </ProxiCard>
+
+            <ProxiButton Text="Se déconnecter" Command="{Binding LogoutCommand}" />
 
         </VerticalStackLayout>
 

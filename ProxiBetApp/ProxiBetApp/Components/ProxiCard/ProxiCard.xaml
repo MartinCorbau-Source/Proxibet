@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+Border interne qualifié via <ContentView.Content> : sans ça, le ContentProperty (CardContent)
+capterait le Border lui-même au lieu du contenu de la page consommatrice.
+-->
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ProxiBetApp.Components.ProxiCard"
+             x:Name="Root">
+
+    <ContentView.Content>
+        <Border x:Name="InnerBorder">
+            <VerticalStackLayout x:Name="InnerLayout" Spacing="{StaticResource size160}" />
+        </Border>
+    </ContentView.Content>
+
+</ContentView>
